@@ -2,7 +2,7 @@ package cn.darkjrong.hbase;
 
 import cn.darkjrong.hbase.common.callback.MutatorCallback;
 import cn.darkjrong.hbase.common.callback.TableCallback;
-import cn.darkjrong.hbase.common.constants.QueryConstant;
+import cn.darkjrong.hbase.common.constants.HbaseConstant;
 import cn.darkjrong.hbase.common.domain.ServerInfo;
 import cn.darkjrong.hbase.common.domain.TableInfo;
 import cn.darkjrong.hbase.common.enums.ExceptionEnum;
@@ -256,7 +256,7 @@ public class HbaseTemplate implements HbaseOperations {
     public Boolean createTable(String tableName, String columnFamily) {
         Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
         if (StrUtil.isBlank(columnFamily)) {
-            columnFamily = QueryConstant.DEFAULT_COLUMN_FAMILY;
+            columnFamily = HbaseConstant.DEFAULT_COLUMN_FAMILY;
         }
 
         if (!tableExists(tableName)) {
@@ -284,7 +284,7 @@ public class HbaseTemplate implements HbaseOperations {
     public Boolean createTable(String tableName, String startKey, String endKey, int numRegions) {
         Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
         if (!tableExists(tableName)) {
-            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(QueryConstant.DEFAULT_COLUMN_FAMILY)).setMaxVersions(1).build();
+            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(HbaseConstant.DEFAULT_COLUMN_FAMILY)).setMaxVersions(1).build();
             TableDescriptor tableDescriptor = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName)).setColumnFamily(cfd).build();
             try {
                 admin.createTable(tableDescriptor, Bytes.toBytes(startKey), Bytes.toBytes(endKey), numRegions);

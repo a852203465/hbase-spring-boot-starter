@@ -1,10 +1,9 @@
 package cn.darkjrong.hbase.mapping;
 
 import cn.hutool.core.map.MapUtil;
-import lombok.Data;
+import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * hbase映射工厂
@@ -12,16 +11,14 @@ import java.util.Map;
  * @author Rong.Jia
  * @date 2022/11/20
  */
-@Data
-public class HbaseMappedFactory implements Serializable {
-
-    private static final long serialVersionUID = 4990718430270140622L;
+@Component
+public class HbaseMappedFactory {
 
     /**
      * 对象映射关系
      *  key: 对象全限定名, value: 映射关系
      */
-    private static Map<String, ObjectMappedStatement> mappedStatements = MapUtil.newHashMap();
+    private final ConcurrentHashMap<String, ObjectMappedStatement> mappedStatements = MapUtil.newConcurrentHashMap();
 
     /**
      * 添加映射
@@ -29,7 +26,7 @@ public class HbaseMappedFactory implements Serializable {
      * @param id       对象全限定名
      * @param statement 映射
      */
-    public static synchronized void addStatement(String id, ObjectMappedStatement statement) {
+    public void addStatement(String id, ObjectMappedStatement statement) {
         mappedStatements.put(id, statement);
     }
 
@@ -39,18 +36,11 @@ public class HbaseMappedFactory implements Serializable {
      * @param id 对象全限定名
      * @return {@link ObjectMappedStatement}
      */
-    public static ObjectMappedStatement getStatement(String id) {
+    public ObjectMappedStatement getStatement(String id) {
         return mappedStatements.get(id);
     }
 
-    /**
-     * 获取映射
-     *
-     * @return {@link Map}<{@link String}, {@link ObjectMappedStatement}>
-     */
-    public static Map<String, ObjectMappedStatement> getStatements() {
-        return mappedStatements;
-    }
+
 
 
 

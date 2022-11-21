@@ -1,10 +1,10 @@
-package cn.darkjrong.hbase.common.configuration;
+package cn.darkjrong.hbase.common.config;
 
 import cn.darkjrong.hbase.common.annotation.ColumnName;
 import cn.darkjrong.hbase.common.annotation.MappedScan;
 import cn.darkjrong.hbase.common.annotation.TableId;
 import cn.darkjrong.hbase.common.annotation.TableName;
-import cn.darkjrong.hbase.common.constants.QueryConstant;
+import cn.darkjrong.hbase.common.constants.HbaseConstant;
 import cn.darkjrong.hbase.common.enums.ExceptionEnum;
 import cn.darkjrong.hbase.mapping.HbaseMappedFactory;
 import cn.darkjrong.hbase.mapping.ObjectMappedStatement;
@@ -17,6 +17,9 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -42,17 +45,11 @@ import java.util.stream.Collectors;
  * @date 2022/11/20
  */
 @Slf4j
-public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware {
+public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware, BeanFactoryAware {
 
-    /**
-     * 资源加载器
-     */
     private ResourceLoader resourceLoader;
-
-    /**
-     * 环境
-     */
     private Environment environment;
+    private BeanFactory beanFactory;
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
@@ -110,12 +107,12 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
         Map<String, ObjectProperty> properties = parseProperties(className);
         ObjectProperty objectProperty = properties.values().stream().filter(a -> a.getField().isAnnotationPresent(TableId.class)).findAny().orElse(null);
         if (ObjectUtil.isEmpty(objectProperty)) {
-            objectProperty = properties.get(QueryConstant.ID);
+            objectProperty = properties.get(HbaseConstant.ID);
         }
         Assert.notNull(objectProperty, ExceptionEnum.getException(ExceptionEnum.ID_NOT_FOUND, className));
         objectMappedStatement.setProperties(properties);
         objectMappedStatement.setTableId(objectProperty.getField());
-        HbaseMappedFactory.addStatement(className, objectMappedStatement);
+        getFactory().addStatement(className, objectMappedStatement);
     }
 
     /**
@@ -178,14 +175,14 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
         Set<String> basePackages = new HashSet<>();
         assert attributes != null;
         // value 属性是否有配置值，如果有则添加
-        for (String pkg : (String[]) attributes.get("value")) {
+        for (String pkg : (String[]) attributes.get(HbaseConstant.VALUE)) {
             if (StringUtils.hasText(pkg)) {
                 basePackages.add(pkg);
             }
         }
 
         // basePackages 属性是否有配置值，如果有则添加
-        for (String pkg : (String[]) attributes.get("basePackages")) {
+        for (String pkg : (String[]) attributes.get(HbaseConstant.BASE_PACKAGES)) {
             if (StringUtils.hasText(pkg)) {
                 basePackages.add(pkg);
             }
@@ -206,9 +203,9 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
      * @return {@link String}
      */
     private String getTableName(Map<String, Object> attributes) {
-        String name = Convert.toStr(attributes.get("name"));
+        String name = Convert.toStr(attributes.get(HbaseConstant.NAME));
         if (StrUtil.isBlank(name)) {
-            name = Convert.toStr(attributes.get("value"));
+            name = Convert.toStr(attributes.get(HbaseConstant.VALUE));
         }
         return name;
     }
@@ -220,7 +217,16 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
      * @return {@link String}
      */
     private String getColumnFamily(Map<String, Object> attributes) {
-        return Convert.toStr(attributes.get("columnFamily"));
+        return Convert.toStr(attributes.get(HbaseConstant.COLUMN_FAMILY));
+    }
+
+    /**
+     * 获取工厂
+     *
+     * @return {@link HbaseMappedFactory}
+     */
+    private HbaseMappedFactory getFactory() {
+       return beanFactory.getBean(HbaseMappedFactory.class);
     }
 
     @Override
@@ -233,4 +239,8 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
         this.resourceLoader = resourceLoader;
     }
 
+    @Override
+    public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+        this.beanFactory = beanFactory;
+    }
 }

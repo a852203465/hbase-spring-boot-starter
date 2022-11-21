@@ -1,6 +1,6 @@
 package cn.darkjrong.hbase.common.annotation;
 
-import cn.darkjrong.hbase.common.constants.QueryConstant;
+import cn.darkjrong.hbase.common.constants.HbaseConstant;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;
@@ -37,7 +37,7 @@ public @interface TableName {
      *
      * @return {@link String}
      */
-    String columnFamily() default QueryConstant.DEFAULT_COLUMN_FAMILY;
+    String columnFamily() default HbaseConstant.DEFAULT_COLUMN_FAMILY;
 
 
 

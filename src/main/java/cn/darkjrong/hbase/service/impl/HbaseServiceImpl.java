@@ -3,7 +3,7 @@ package cn.darkjrong.hbase.service.impl;
 import cn.darkjrong.hbase.HbaseTemplate;
 import cn.darkjrong.hbase.common.annotation.TableName;
 import cn.darkjrong.hbase.common.callback.RowMapper;
-import cn.darkjrong.hbase.common.constants.QueryConstant;
+import cn.darkjrong.hbase.common.constants.HbaseConstant;
 import cn.darkjrong.hbase.common.enums.ExceptionEnum;
 import cn.darkjrong.hbase.common.exceptions.HbaseException;
 import cn.darkjrong.hbase.common.utils.HbaseUtils;
@@ -52,7 +52,7 @@ public class HbaseServiceImpl<T, ID> implements HbaseService<T, ID> {
         List<Mutation> mutations = new ArrayList<>();
         Put put = new Put(Bytes.toBytes(fields.size()));
         for (Field field : fields) {
-            put.addColumn(Bytes.toBytes(QueryConstant.DEFAULT_COLUMN_FAMILY),
+            put.addColumn(Bytes.toBytes(HbaseConstant.DEFAULT_COLUMN_FAMILY),
                     Bytes.toBytes(field.getName()), Bytes.toBytes(Convert.toStr(ReflectUtil.getFieldValue(entity, field))));
         }
         mutations.add(put);

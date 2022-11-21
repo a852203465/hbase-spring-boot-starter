@@ -3,7 +3,7 @@ package cn.darkjrong.hbase;
 import cn.darkjrong.hbase.common.annotation.ColumnName;
 import cn.darkjrong.hbase.common.annotation.TableId;
 import cn.darkjrong.hbase.common.annotation.TableName;
-import cn.darkjrong.hbase.common.constants.QueryConstant;
+import cn.darkjrong.hbase.common.constants.HbaseConstant;
 import cn.darkjrong.hbase.common.enums.ExceptionEnum;
 import cn.darkjrong.hbase.mapping.HbaseMappedFactory;
 import cn.darkjrong.hbase.mapping.ObjectMappedStatement;
@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 
 public class HbaseMappedFactoryTest {
 
+    protected HbaseMappedFactory hbaseMappedFactory = new HbaseMappedFactory();
+
     @BeforeEach
     void mappedStatements() {
 
@@ -42,18 +44,13 @@ public class HbaseMappedFactoryTest {
             Map<String, ObjectProperty> properties = parseProperties(clazz);
             ObjectProperty objectProperty = properties.values().stream().filter(a -> a.getField().isAnnotationPresent(TableId.class)).findAny().orElse(null);
             if (ObjectUtil.isEmpty(objectProperty)) {
-                objectProperty = properties.get(QueryConstant.ID);
+                objectProperty = properties.get(HbaseConstant.ID);
             }
             Assert.notNull(objectProperty, ExceptionEnum.getException(ExceptionEnum.ID_NOT_FOUND, className));
             objectMappedStatement.setProperties(properties);
             objectMappedStatement.setTableId(objectProperty.getField());
-            HbaseMappedFactory.addStatement(className, objectMappedStatement);
+            hbaseMappedFactory.addStatement(className, objectMappedStatement);
         }
-
-        Map<String, ObjectMappedStatement> statements = HbaseMappedFactory.getStatements();
-        System.out.println(statements.toString());
-
-
     }
 
     /**

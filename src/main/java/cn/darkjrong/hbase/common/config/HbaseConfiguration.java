@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.configuration;
+package cn.darkjrong.hbase.common.config;
 
 import cn.darkjrong.hbase.HbaseTemplate;
 import lombok.AllArgsConstructor;

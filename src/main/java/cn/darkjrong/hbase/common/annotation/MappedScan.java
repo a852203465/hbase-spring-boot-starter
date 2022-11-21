@@ -1,6 +1,6 @@
 package cn.darkjrong.hbase.common.annotation;
 
-import cn.darkjrong.hbase.common.configuration.ObjectMappedScanner;
+import cn.darkjrong.hbase.common.config.ObjectMappedScanner;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
