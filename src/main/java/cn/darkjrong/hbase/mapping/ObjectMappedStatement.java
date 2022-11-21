@@ -33,9 +33,19 @@ public class ObjectMappedStatement implements Serializable {
     private String tableName;
 
     /**
+     * 表名字节数组
+     */
+    private byte[] tableNameBytes;
+
+    /**
      * 列族名
      */
     private String columnFamily;
+
+    /**
+     * 列族名节数组
+     */
+    private byte[] columnFamilyBytes;
 
     /**
      * 属性集合, key: 字段名, value: 字段属性

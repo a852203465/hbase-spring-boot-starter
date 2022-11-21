@@ -243,7 +243,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean createTable(String tableName) {
-        return createTable(tableName, null);
+        return createTable(tableName, HbaseConstant.DEFAULT_COLUMN_FAMILY);
     }
 
     /**

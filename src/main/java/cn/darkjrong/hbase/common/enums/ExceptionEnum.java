@@ -18,7 +18,7 @@ public enum ExceptionEnum {
     SPECIFIED_VALUE("The specified 【%s】 does not exist, please confirm"),
     TABLE_NAME_NOT_FOUND("'tableName' not found in target class"),
     ID_NOT_FOUND("The object 【{}】 did not find the primary key ID field. The object must specify the primary key ID or define a field with the attribute name 'id'"),
-
+    MAPPED("Add the mapping relationship of the 【{}】 object"),
 
 
 

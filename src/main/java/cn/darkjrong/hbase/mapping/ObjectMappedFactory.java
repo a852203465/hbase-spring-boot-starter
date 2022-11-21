@@ -6,13 +6,13 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * hbase映射工厂
+ * 对象映射工厂
  *
  * @author Rong.Jia
  * @date 2022/11/20
  */
 @Component
-public class HbaseMappedFactory {
+public class ObjectMappedFactory {
 
     /**
      * 对象映射关系

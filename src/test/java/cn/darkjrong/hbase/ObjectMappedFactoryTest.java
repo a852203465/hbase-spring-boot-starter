@@ -5,7 +5,7 @@ import cn.darkjrong.hbase.common.annotation.TableId;
 import cn.darkjrong.hbase.common.annotation.TableName;
 import cn.darkjrong.hbase.common.constants.HbaseConstant;
 import cn.darkjrong.hbase.common.enums.ExceptionEnum;
-import cn.darkjrong.hbase.mapping.HbaseMappedFactory;
+import cn.darkjrong.hbase.mapping.ObjectMappedFactory;
 import cn.darkjrong.hbase.mapping.ObjectMappedStatement;
 import cn.darkjrong.hbase.mapping.ObjectProperty;
 import cn.hutool.core.collection.CollectionUtil;
@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class HbaseMappedFactoryTest {
+public class ObjectMappedFactoryTest {
 
-    protected HbaseMappedFactory hbaseMappedFactory = new HbaseMappedFactory();
+    protected ObjectMappedFactory objectMappedFactory = new ObjectMappedFactory();
 
     @BeforeEach
-    void mappedStatements() {
+    public void mappedStatements() {
 
         List<String> classNames = CollectionUtil.newArrayList();
         classNames.add(Student.class.getName());
@@ -40,7 +40,9 @@ public class HbaseMappedFactoryTest {
             ObjectMappedStatement objectMappedStatement = new ObjectMappedStatement();
             objectMappedStatement.setId(className);
             objectMappedStatement.setTableName(clazz.getAnnotation(TableName.class).value());
+            objectMappedStatement.setTableNameBytes(Bytes.toBytes(objectMappedStatement.getTableName()));
             objectMappedStatement.setColumnFamily(clazz.getAnnotation(TableName.class).columnFamily());
+            objectMappedStatement.setColumnFamilyBytes(Bytes.toBytes(objectMappedStatement.getColumnFamily()));
             Map<String, ObjectProperty> properties = parseProperties(clazz);
             ObjectProperty objectProperty = properties.values().stream().filter(a -> a.getField().isAnnotationPresent(TableId.class)).findAny().orElse(null);
             if (ObjectUtil.isEmpty(objectProperty)) {
@@ -49,7 +51,7 @@ public class HbaseMappedFactoryTest {
             Assert.notNull(objectProperty, ExceptionEnum.getException(ExceptionEnum.ID_NOT_FOUND, className));
             objectMappedStatement.setProperties(properties);
             objectMappedStatement.setTableId(objectProperty.getField());
-            hbaseMappedFactory.addStatement(className, objectMappedStatement);
+            objectMappedFactory.addStatement(className, objectMappedStatement);
         }
     }
 

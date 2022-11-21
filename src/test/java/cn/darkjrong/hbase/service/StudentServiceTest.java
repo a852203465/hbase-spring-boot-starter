@@ -1,50 +1,38 @@
 package cn.darkjrong.hbase.service;
 
-import cn.darkjrong.hbase.HbaseMappedFactoryTest;
-import cn.darkjrong.hbase.HbaseTemplate;
 import cn.darkjrong.hbase.Student;
+import cn.darkjrong.hbase.TestInit;
 import cn.darkjrong.hbase.service.impl.StudentServiceImpl;
-import cn.darkjrong.spring.boot.autoconfigure.HbaseFactoryBean;
-import cn.darkjrong.spring.boot.autoconfigure.HbaseProperties;
 import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSON;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.client.Connection;
-import org.apache.hadoop.hbase.client.ConnectionFactory;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 
-public class StudentServiceTest extends HbaseMappedFactoryTest {
+public class StudentServiceTest extends TestInit {
 
     private StudentService studentService;
-    private HbaseTemplate hbaseTemplate;
 
     @BeforeEach
-    void before() throws IOException {
-        HbaseProperties hbaseProperties = new HbaseProperties();
-        hbaseProperties.setQuorum("127.0.0.1:2181");
-        hbaseProperties.setRootDir("hdfs://localhost:8020/hbase");
-        hbaseProperties.setNodeParent("/hbase");
-        hbaseProperties.setTableSanityChecks(Boolean.TRUE);
-        HbaseFactoryBean hbaseFactoryBean = new HbaseFactoryBean(hbaseProperties);
-        hbaseFactoryBean.afterPropertiesSet();
-        Configuration configuration = hbaseFactoryBean.getObject();
-        Connection connection = ConnectionFactory.createConnection(configuration);
-        HBaseAdmin hBaseAdmin = (HBaseAdmin) connection.getAdmin();
-        hbaseTemplate = new HbaseTemplate(connection, hBaseAdmin);
-
+    public void before() {
         studentService = new StudentServiceImpl();
         ReflectUtil.setFieldValue(studentService, "hbaseTemplate", hbaseTemplate);
+        ReflectUtil.setFieldValue(studentService, "objectParser", objectParser);
     }
 
     @Test
     void createTable() {
 
         Boolean student = hbaseTemplate.createTable("student");
+        System.out.println(student);
+
+    }
+
+    @Test
+    void deleteTable() {
+
+        Boolean student = hbaseTemplate.deleteTable("student");
         System.out.println(student);
 
     }

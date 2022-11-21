@@ -59,7 +59,7 @@ public interface HbaseOperations {
      *
      * @param tableName    表名
      * @param columnFamily 列族
-     * @param qualifier 限定词
+     * @param qualifier 字段名
      * @param extractor    结果提取器
      * @return {@link T}
      */
@@ -99,7 +99,7 @@ public interface HbaseOperations {
      *
      * @param tableName    表名
      * @param columnFamily 列族
-     * @param qualifier 限定词
+     * @param qualifier 字段名
      * @param rowMapper    行映射器
      * @return {@link List}<{@link T}>
      */
@@ -143,7 +143,7 @@ public interface HbaseOperations {
      * @param rowName      行名称
      * @param rowMapper    行映射器
      * @param columnFamily 列族
-     * @param qualifier    限定符
+     * @param qualifier    字段名
      * @return {@link T}
      */
     <T> T get(String tableName, String rowName, String columnFamily, String qualifier, RowMapper<T> rowMapper);
@@ -153,7 +153,7 @@ public interface HbaseOperations {
      *
      * @param tableName    表名
      * @param rowName      行名称
-     * @param qualifier    限定符
+     * @param qualifier    字段名
      * @param data         数据
      * @param columnFamily 列族
      */
@@ -174,7 +174,7 @@ public interface HbaseOperations {
      * @param tableName    表名
      * @param rowName      行名称
      * @param columnFamily 列族
-     * @param qualifier    限定符
+     * @param qualifier    字段名
      */
     void delete(String tableName, final String rowName, final String columnFamily, final String qualifier);
 

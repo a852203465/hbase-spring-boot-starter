@@ -6,7 +6,7 @@ import cn.darkjrong.hbase.common.annotation.TableId;
 import cn.darkjrong.hbase.common.annotation.TableName;
 import cn.darkjrong.hbase.common.constants.HbaseConstant;
 import cn.darkjrong.hbase.common.enums.ExceptionEnum;
-import cn.darkjrong.hbase.mapping.HbaseMappedFactory;
+import cn.darkjrong.hbase.mapping.ObjectMappedFactory;
 import cn.darkjrong.hbase.mapping.ObjectMappedStatement;
 import cn.darkjrong.hbase.mapping.ObjectProperty;
 import cn.hutool.core.collection.CollectionUtil;
@@ -81,7 +81,6 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
 
                     // 获取@TableName注解的属性
                     Map<String, Object> attributes = annotationMetadata.getAnnotationAttributes(TableName.class.getCanonicalName());
-                    // 注册到容器
                     parseTableName(registry, annotationMetadata, attributes);
                 }
             }
@@ -102,8 +101,12 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
 
         ObjectMappedStatement objectMappedStatement = new ObjectMappedStatement();
         objectMappedStatement.setId(className);
-        objectMappedStatement.setTableName(getTableName(attributes));
-        objectMappedStatement.setColumnFamily(getColumnFamily(attributes));
+        String tableName = getTableName(attributes);
+        objectMappedStatement.setTableName(tableName);
+        objectMappedStatement.setTableNameBytes(Bytes.toBytes(tableName));
+        String columnFamily = getColumnFamily(attributes);
+        objectMappedStatement.setColumnFamily(columnFamily);
+        objectMappedStatement.setColumnFamilyBytes(Bytes.toBytes(columnFamily));
         Map<String, ObjectProperty> properties = parseProperties(className);
         ObjectProperty objectProperty = properties.values().stream().filter(a -> a.getField().isAnnotationPresent(TableId.class)).findAny().orElse(null);
         if (ObjectUtil.isEmpty(objectProperty)) {
@@ -223,10 +226,10 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
     /**
      * 获取工厂
      *
-     * @return {@link HbaseMappedFactory}
+     * @return {@link ObjectMappedFactory}
      */
-    private HbaseMappedFactory getFactory() {
-       return beanFactory.getBean(HbaseMappedFactory.class);
+    private ObjectMappedFactory getFactory() {
+       return beanFactory.getBean(ObjectMappedFactory.class);
     }
 
     @Override
