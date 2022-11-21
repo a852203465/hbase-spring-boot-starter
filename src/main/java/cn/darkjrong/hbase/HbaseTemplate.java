@@ -11,7 +11,6 @@ import cn.darkjrong.hbase.common.callback.ResultsExtractor;
 import cn.darkjrong.hbase.common.callback.RowMapper;
 import cn.darkjrong.hbase.common.callback.RowMapperResultsExtractor;
 import cn.darkjrong.hbase.common.utils.HbaseUtils;
-import cn.darkjrong.hbase.common.utils.PropertiesUtils;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
@@ -169,7 +168,7 @@ public class HbaseTemplate implements HbaseOperations {
     public List<TableInfo> getTableNames() {
         try {
             TableName[] tableNames = admin.listTableNames();
-            return PropertiesUtils.tableInfos(CollectionUtil.newArrayList(tableNames));
+            return tableInfos(CollectionUtil.newArrayList(tableNames));
         } catch (IOException e) {
             log.error("getTableNames", e);
         }
@@ -213,7 +212,7 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notNull(pattern, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "pattern"));
         try {
             TableName[] tableNames = admin.listTableNames(pattern, includeSysTables);
-            return PropertiesUtils.tableInfos(CollectionUtil.newArrayList(tableNames));
+            return tableInfos(CollectionUtil.newArrayList(tableNames));
         } catch (IOException e) {
             log.error("getTableNames", e);
         }
@@ -1834,7 +1833,40 @@ public class HbaseTemplate implements HbaseOperations {
         });
     }
 
+    /**
+     * 表信息
+     *
+     * @param tableNames 表名
+     * @return {@link List}<{@link TableInfo}>
+     */
+    public static List<TableInfo> tableInfos(List<TableName> tableNames) {
+        if (CollectionUtil.isEmpty(tableNames)) {
+            return Collections.emptyList();
+        }
+        List<TableInfo> tableInfos = new ArrayList<>();
+        for (TableName tableName : tableNames) {
+            Optional.ofNullable(tableInfo(tableName)).ifPresent(tableInfos::add);
+        }
+        return tableInfos;
+    }
 
+    /**
+     * 表信息
+     *
+     * @param tableName 表名
+     * @return {@link TableInfo}
+     */
+    public static TableInfo tableInfo(TableName tableName) {
+        if (ObjectUtil.isEmpty(tableName)) {
+            return null;
+        }
+        TableInfo tableInfo = new TableInfo();
+        tableInfo.setName(tableName.getNameAsString());
+        tableInfo.setNamespace(tableName.getNamespaceAsString());
+        tableInfo.setQualifier(tableName.getQualifierAsString());
+        tableInfo.setSystemTable(tableName.isSystemTable());
+        return tableInfo;
+    }
 
 
 }
