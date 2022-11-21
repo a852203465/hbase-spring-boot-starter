@@ -11,12 +11,18 @@ import java.util.List;
 public interface HbaseService<T, ID> {
 
     /**
-     * 保存
+     * 添加
      *
      * @param entity 实体
+     * @return {@link S}
      */
-    void save(T entity);
+    <S extends T> S save(S entity);
 
+    /**
+     * 查询所有
+     *
+     * @return {@link List}<{@link T}>
+     */
     List<T> findAll();
 
 //    <S extends T> Iterable<S> saveAll(Iterable<S> entities);

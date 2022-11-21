@@ -1,6 +1,7 @@
 package cn.darkjrong.hbase.common.config;
 
 import cn.darkjrong.hbase.HbaseTemplate;
+import cn.darkjrong.hbase.repository.ObjectParser;
 import lombok.AllArgsConstructor;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
@@ -37,7 +38,10 @@ public class HbaseConfiguration {
         return new HbaseTemplate(connection, admin);
     }
 
-
+    @Bean
+    public ObjectParser objectParser(ObjectMappedFactory factory) {
+        return new ObjectParser(factory);
+    }
 
 
 

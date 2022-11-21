@@ -1,17 +1,16 @@
-package cn.darkjrong.hbase.common.callback;
+package cn.darkjrong.hbase.repository;
 
 import cn.darkjrong.hbase.common.enums.ExceptionEnum;
 import cn.darkjrong.hbase.common.utils.HbaseUtils;
-import cn.darkjrong.hbase.mapping.ObjectMappedFactory;
-import cn.darkjrong.hbase.mapping.ObjectMappedStatement;
-import cn.darkjrong.hbase.mapping.ObjectProperty;
+import cn.darkjrong.hbase.common.config.ObjectMappedFactory;
+import cn.darkjrong.hbase.common.domain.ObjectMappedStatement;
+import cn.darkjrong.hbase.common.domain.ObjectProperty;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
+import lombok.AllArgsConstructor;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -21,11 +20,10 @@ import java.util.Map;
  * @author Rong.Jia
  * @date 2022/11/21
  */
-@Component
+@AllArgsConstructor
 public class ObjectParser {
 
-    @Autowired
-    private ObjectMappedFactory objectMappedFactory;
+    private final ObjectMappedFactory objectMappedFactory;
 
     /**
      * 解析

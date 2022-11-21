@@ -6,9 +6,8 @@ import cn.darkjrong.hbase.common.annotation.TableId;
 import cn.darkjrong.hbase.common.annotation.TableName;
 import cn.darkjrong.hbase.common.constants.HbaseConstant;
 import cn.darkjrong.hbase.common.enums.ExceptionEnum;
-import cn.darkjrong.hbase.mapping.ObjectMappedFactory;
-import cn.darkjrong.hbase.mapping.ObjectMappedStatement;
-import cn.darkjrong.hbase.mapping.ObjectProperty;
+import cn.darkjrong.hbase.common.domain.ObjectMappedStatement;
+import cn.darkjrong.hbase.common.domain.ObjectProperty;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ClassUtil;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
  * @date 2022/11/20
  */
 @Slf4j
-public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware, BeanFactoryAware {
+public class ObjectMappedRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware, EnvironmentAware, BeanFactoryAware {
 
     private ResourceLoader resourceLoader;
     private Environment environment;
@@ -115,6 +114,7 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
         Assert.notNull(objectProperty, ExceptionEnum.getException(ExceptionEnum.ID_NOT_FOUND, className));
         objectMappedStatement.setProperties(properties);
         objectMappedStatement.setTableId(objectProperty.getField());
+        objectMappedStatement.setRowKey(Bytes.toBytes(properties.size()));
         getFactory().addStatement(className, objectMappedStatement);
     }
 
@@ -128,7 +128,9 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
         Class<Object> clazz = ClassUtil.loadClass(className);
         if (ObjectUtil.isNotNull(clazz)) {
             List<ObjectProperty> objectProperties = CollectionUtil.newArrayList(ReflectUtil.getFields(clazz))
-                    .stream().map(a -> {
+                    .stream()
+                    .filter(a -> !StrUtil.equals(HbaseConstant.SERIAL_VERSION_ID, a.getName()))
+                    .map(a -> {
                         ObjectProperty objectProperty = new ObjectProperty();
                         objectProperty.setField(a);
 
@@ -177,21 +179,16 @@ public class ObjectMappedScanner implements ImportBeanDefinitionRegistrar, Resou
         Map<String, Object> attributes = importingClassMetadata.getAnnotationAttributes(MappedScan.class.getCanonicalName());
         Set<String> basePackages = new HashSet<>();
         assert attributes != null;
-        // value 属性是否有配置值，如果有则添加
         for (String pkg : (String[]) attributes.get(HbaseConstant.VALUE)) {
             if (StringUtils.hasText(pkg)) {
                 basePackages.add(pkg);
             }
         }
-
-        // basePackages 属性是否有配置值，如果有则添加
         for (String pkg : (String[]) attributes.get(HbaseConstant.BASE_PACKAGES)) {
             if (StringUtils.hasText(pkg)) {
                 basePackages.add(pkg);
             }
         }
-
-        // 如果上面两步都没有获取到basePackages，那么这里就默认使用当前项目启动类所在的包为basePackages
         if (basePackages.isEmpty()) {
             basePackages.add(ClassUtils.getPackageName(importingClassMetadata.getClassName()));
         }

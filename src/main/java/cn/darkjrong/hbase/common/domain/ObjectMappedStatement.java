@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.mapping;
+package cn.darkjrong.hbase.common.domain;
 
 import lombok.Data;
 
@@ -46,6 +46,11 @@ public class ObjectMappedStatement implements Serializable {
      * 列族名节数组
      */
     private byte[] columnFamilyBytes;
+
+    /**
+     * 行数
+     */
+    private byte[] rowKey;
 
     /**
      * 属性集合, key: 字段名, value: 字段属性

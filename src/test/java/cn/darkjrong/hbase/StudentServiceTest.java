@@ -1,7 +1,6 @@
-package cn.darkjrong.hbase.service;
+package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.Student;
-import cn.darkjrong.hbase.TestInit;
+import cn.darkjrong.hbase.service.StudentService;
 import cn.darkjrong.hbase.service.impl.StudentServiceImpl;
 import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSON;
@@ -57,7 +56,6 @@ public class StudentServiceTest extends TestInit {
 
         List<Student> students = studentService.findAll();
         System.out.println(JSON.toJSONString(students));
-
     }
 
 

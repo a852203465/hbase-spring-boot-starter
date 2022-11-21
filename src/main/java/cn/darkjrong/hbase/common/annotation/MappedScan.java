@@ -1,6 +1,6 @@
 package cn.darkjrong.hbase.common.annotation;
 
-import cn.darkjrong.hbase.common.config.ObjectMappedScanner;
+import cn.darkjrong.hbase.common.config.ObjectMappedRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -13,7 +13,7 @@ import java.lang.annotation.*;
  */
 @Documented
 @Target({ElementType.TYPE})
-@Import({ObjectMappedScanner.class})
+@Import({ObjectMappedRegistrar.class})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MappedScan {
 

@@ -1,5 +1,6 @@
-package cn.darkjrong.hbase.mapping;
+package cn.darkjrong.hbase.common.config;
 
+import cn.darkjrong.hbase.common.domain.ObjectMappedStatement;
 import cn.hutool.core.map.MapUtil;
 import org.springframework.stereotype.Component;
 
