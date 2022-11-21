@@ -1,6 +1,6 @@
 package cn.darkjrong.hbase.common.callback;
 
-import cn.darkjrong.hbase.common.exceptions.HbaseException;
+import cn.darkjrong.hbase.HbaseException;
 import org.apache.hadoop.hbase.client.ResultScanner;
 
 /**

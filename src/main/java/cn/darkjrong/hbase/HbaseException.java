@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.exceptions;
+package cn.darkjrong.hbase;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;

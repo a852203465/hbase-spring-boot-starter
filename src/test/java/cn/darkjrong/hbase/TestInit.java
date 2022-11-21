@@ -1,6 +1,5 @@
 package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.repository.ObjectParser;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseFactoryBean;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseProperties;
 import org.apache.hadoop.conf.Configuration;
@@ -14,7 +13,6 @@ import java.io.IOException;
 public class TestInit extends ObjectMappedFactoryTest {
 
     protected HbaseTemplate hbaseTemplate;
-    protected ObjectParser objectParser;
 
     @BeforeEach
    public void testInit() throws IOException {
@@ -29,7 +27,6 @@ public class TestInit extends ObjectMappedFactoryTest {
         Connection connection = ConnectionFactory.createConnection(configuration);
         HBaseAdmin hBaseAdmin = (HBaseAdmin) connection.getAdmin();
         hbaseTemplate = new HbaseTemplate(connection, hBaseAdmin);
-        objectParser = new ObjectParser(objectMappedFactory);
     }
 
 

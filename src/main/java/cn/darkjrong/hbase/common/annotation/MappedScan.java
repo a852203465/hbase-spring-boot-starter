@@ -1,6 +1,6 @@
 package cn.darkjrong.hbase.common.annotation;
 
-import cn.darkjrong.hbase.common.config.ObjectMappedRegistrar;
+import cn.darkjrong.hbase.factory.ObjectMappedRegistrar;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;

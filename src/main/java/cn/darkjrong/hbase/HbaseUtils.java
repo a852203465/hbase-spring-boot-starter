@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.utils;
+package cn.darkjrong.hbase;
 
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;

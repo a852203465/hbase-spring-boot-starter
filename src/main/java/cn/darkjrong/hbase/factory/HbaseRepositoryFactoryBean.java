@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.config;
+package cn.darkjrong.hbase.factory;
 
 import cn.darkjrong.hbase.repository.HbaseRepository;
 import org.springframework.beans.factory.FactoryBean;

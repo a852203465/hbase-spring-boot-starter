@@ -3,9 +3,7 @@ package cn.darkjrong.hbase;
 import cn.darkjrong.hbase.common.annotation.ColumnName;
 import cn.darkjrong.hbase.common.annotation.TableId;
 import cn.darkjrong.hbase.common.annotation.TableName;
-import cn.darkjrong.hbase.common.constants.HbaseConstant;
-import cn.darkjrong.hbase.common.enums.ExceptionEnum;
-import cn.darkjrong.hbase.common.config.ObjectMappedFactory;
+import cn.darkjrong.hbase.factory.ObjectMappedFactory;
 import cn.darkjrong.hbase.common.domain.ObjectMappedStatement;
 import cn.darkjrong.hbase.common.domain.ObjectProperty;
 import cn.hutool.core.collection.CollectionUtil;
@@ -48,8 +46,8 @@ public class ObjectMappedFactoryTest {
             if (ObjectUtil.isEmpty(objectProperty)) {
                 objectProperty = properties.get(HbaseConstant.ID);
             }
-            Assert.notNull(objectProperty, ExceptionEnum.getException(ExceptionEnum.ID_NOT_FOUND, className));
-            objectMappedStatement.setProperties(properties);
+            Assert.notNull(objectProperty, HbaseExceptionEnum.getException(HbaseExceptionEnum.ID_NOT_FOUND, className));
+            objectMappedStatement.setColumns(properties);
             objectMappedStatement.setTableId(objectProperty.getField());
             objectMappedFactory.addStatement(className, objectMappedStatement);
         }

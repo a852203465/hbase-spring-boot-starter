@@ -25,17 +25,12 @@ public class HbaseServiceImpl<T, ID> implements HbaseService<T, ID> {
 
     @Override
     public <S extends T> S save(S entity) {
+        currentTargetClass();
        return hbaseRepository.save(entity);
     }
 
     @Override
     public List<T> findAll() {
-//        return hbaseTemplate.find(currentTable(), new RowMapper<T>() {
-//            @Override
-//            public T mapRow(Result result, int rowNum) {
-//                return objectParser.parse(currentTargetClass(), result);
-//            }
-//        });
-        return null;
+        return hbaseRepository.findAll();
     }
 }

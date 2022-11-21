@@ -1,13 +1,16 @@
 package cn.darkjrong.hbase.repository;
 
 import cn.darkjrong.hbase.HbaseTemplate;
-import cn.darkjrong.hbase.common.config.ObjectMappedFactory;
+import cn.darkjrong.hbase.common.callback.RowMapper;
 import cn.darkjrong.hbase.common.domain.ObjectMappedStatement;
+import cn.darkjrong.hbase.factory.ObjectMappedFactory;
+import cn.darkjrong.hbase.factory.ObjectParser;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import lombok.AllArgsConstructor;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.stereotype.Component;
 
@@ -26,8 +29,7 @@ import java.util.List;
 public class SimpleHbaseRepository<T, ID> implements HbaseRepository<T, ID> {
 
     private final HbaseTemplate hbaseTemplate;
-    private final ObjectParser objectParser;
-    private final ObjectMappedFactory factory;
+    private final ObjectMappedFactory objectMappedFactory;
 
     protected Class<T> currentTargetClass() {
         ParameterizedType parameterizedType = (ParameterizedType) this.getClass().getGenericSuperclass();
@@ -35,7 +37,7 @@ public class SimpleHbaseRepository<T, ID> implements HbaseRepository<T, ID> {
     }
 
     protected ObjectMappedStatement currentStatement() {
-       return factory.getStatement(currentTargetClass().getName());
+       return objectMappedFactory.getStatement(currentTargetClass().getName());
     }
 
     @Override
@@ -43,7 +45,7 @@ public class SimpleHbaseRepository<T, ID> implements HbaseRepository<T, ID> {
         ObjectMappedStatement mappedStatement = currentStatement();
         List<Mutation> mutations = new ArrayList<>();
         Put put = new Put(mappedStatement.getRowKey());
-        mappedStatement.getProperties()
+        mappedStatement.getColumns()
                 .forEach((key, value) ->
                 put.addColumn(mappedStatement.getColumnFamilyBytes(),
                 value.getColumnBytes(),
@@ -53,16 +55,15 @@ public class SimpleHbaseRepository<T, ID> implements HbaseRepository<T, ID> {
         return entity;
     }
 
-
-
-
-
-
-
-
-
-
-
+    @Override
+    public List<T> findAll() {
+        return hbaseTemplate.find(currentStatement().getTableName(), new RowMapper<T>() {
+            @Override
+            public T mapRow(Result result, int rowNum) {
+                return ObjectParser.parse(currentTargetClass(), result, currentStatement());
+            }
+        });
+    }
 
 
 }

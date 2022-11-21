@@ -2,15 +2,11 @@ package cn.darkjrong.hbase;
 
 import cn.darkjrong.hbase.common.callback.MutatorCallback;
 import cn.darkjrong.hbase.common.callback.TableCallback;
-import cn.darkjrong.hbase.common.constants.HbaseConstant;
 import cn.darkjrong.hbase.common.domain.ServerInfo;
 import cn.darkjrong.hbase.common.domain.TableInfo;
-import cn.darkjrong.hbase.common.enums.ExceptionEnum;
-import cn.darkjrong.hbase.common.exceptions.HbaseException;
 import cn.darkjrong.hbase.common.callback.ResultsExtractor;
 import cn.darkjrong.hbase.common.callback.RowMapper;
 import cn.darkjrong.hbase.common.callback.RowMapperResultsExtractor;
-import cn.darkjrong.hbase.common.utils.HbaseUtils;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
@@ -58,7 +54,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean tableExists(String tableName) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         try {
             return admin.tableExists(TableName.valueOf(tableName));
         } catch (IOException e) {
@@ -74,7 +70,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link RegionInfo}
      */
     public RegionInfo getRegion(String regionName) {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
 
         List<RegionInfo> regionInfos = CollectionUtil.newArrayList();
         List<ServerInfo> regionServers = getRegionServers();
@@ -94,7 +90,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link RegionInfo}>
      */
     public List<RegionInfo> getRegionsByTable(String tableName) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         try {
             return admin.getRegions(TableName.valueOf(tableName));
         } catch (IOException e) {
@@ -110,7 +106,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link RegionInfo}>
      */
     public List<RegionInfo> getRegionsByServer(String serverName) {
-        Assert.notBlank(serverName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "serverName"));
+        Assert.notBlank(serverName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "serverName"));
         try {
             return admin.getRegions(ServerName.valueOf(serverName));
         } catch (IOException e) {
@@ -151,7 +147,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link TableDescriptor}>
      */
     public List<TableDescriptor> getTableDescriptors(Pattern pattern, boolean includeSysTables) {
-        Assert.notNull(pattern, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "pattern"));
+        Assert.notNull(pattern, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "pattern"));
         try {
            return admin.listTableDescriptors(pattern, includeSysTables);
         } catch (Exception e) {
@@ -209,7 +205,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link TableInfo}>
      */
     public List<TableInfo> getTableNames(Pattern pattern, boolean includeSysTables) {
-        Assert.notNull(pattern, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "pattern"));
+        Assert.notNull(pattern, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "pattern"));
         try {
             TableName[] tableNames = admin.listTableNames(pattern, includeSysTables);
             return tableInfos(CollectionUtil.newArrayList(tableNames));
@@ -227,7 +223,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @throws HbaseException hbase异常
      */
     public TableDescriptor getTableDescriptor(String tableName) throws HbaseException {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         try {
            return admin.getDescriptor(TableName.valueOf(tableName));
         } catch (IOException e) {
@@ -253,7 +249,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean createTable(String tableName, String columnFamily) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (StrUtil.isBlank(columnFamily)) {
             columnFamily = HbaseConstant.DEFAULT_COLUMN_FAMILY;
         }
@@ -281,7 +277,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @param tableName  表名
      */
     public Boolean createTable(String tableName, String startKey, String endKey, int numRegions) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (!tableExists(tableName)) {
             ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(HbaseConstant.DEFAULT_COLUMN_FAMILY)).setMaxVersions(1).build();
             TableDescriptor tableDescriptor = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName)).setColumnFamily(cfd).build();
@@ -303,7 +299,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean deleteTable(String tableName) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (disableTable(tableName)) {
             try {
                 admin.deleteTable(TableName.valueOf(tableName));
@@ -323,7 +319,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean disableTable(String tableName) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (tableExists(tableName) && !isTableDisabled(tableName)) {
             try {
                 admin.disableTable(TableName.valueOf(tableName));
@@ -342,7 +338,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean isTableDisabled(String tableName) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (tableExists(tableName)) {
             try {
                 return admin.isTableDisabled(TableName.valueOf(tableName));
@@ -360,7 +356,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean enableTable(String tableName) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (tableExists(tableName) && !isTableEnabled(tableName)) {
             try {
                 admin.enableTable(TableName.valueOf(tableName));
@@ -379,7 +375,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean isTableEnabled(String tableName) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (tableExists(tableName)) {
             try {
                 return admin.isTableEnabled(TableName.valueOf(tableName));
@@ -397,7 +393,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean isTableAvailable(String tableName) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (tableExists(tableName)) {
             try {
                 return admin.isTableAvailable(TableName.valueOf(tableName));
@@ -416,8 +412,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean addColumnFamily(String tableName, String columnFamily) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notBlank(columnFamily, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "columnFamily"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
 
         if (tableExists(tableName)) {
             ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(columnFamily)).setMaxVersions(1).build();
@@ -439,8 +435,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean deleteColumnFamily(String tableName, String columnFamily) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notBlank(columnFamily, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "columnFamily"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
 
         if (tableExists(tableName)) {
             try {
@@ -461,8 +457,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean modifyColumnFamily(String tableName, String columnFamily) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notBlank(columnFamily, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "columnFamily"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
         if (tableExists(tableName)) {
             ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(columnFamily))
                     .setMaxVersions(1).build();
@@ -494,7 +490,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean flushTable(String tableName, String columnFamily) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (tableExists(tableName)) {
             try {
                 admin.flush(TableName.valueOf(tableName), StrUtil.isBlank(columnFamily) ? null : Bytes.toBytes(columnFamily));
@@ -523,7 +519,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean flushRegion(String regionName, String columnFamily) {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
             admin.flushRegion(Bytes.toBytes(regionName), StrUtil.isBlank(columnFamily) ? null : Bytes.toBytes(columnFamily));
             return Boolean.TRUE;
@@ -540,7 +536,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean flushRegionServer(String serverName) {
-        Assert.notBlank(serverName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "serverName"));
+        Assert.notBlank(serverName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "serverName"));
         try {
             admin.flushRegionServer(ServerName.valueOf(serverName));
             return Boolean.TRUE;
@@ -579,7 +575,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean compactTable(String tableName, String columnFamily, CompactType compactType) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (ObjectUtil.isEmpty(compactType)) {
             compactType = CompactType.NORMAL;
         }
@@ -610,7 +606,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean compactRegion(String regionName, String columnFamily) {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
             admin.compactRegion(Bytes.toBytes(regionName), Bytes.toBytes(columnFamily));
             return Boolean.TRUE;
@@ -650,7 +646,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean majorCompactTable(String tableName, String columnFamily, CompactType compactType) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (ObjectUtil.isEmpty(compactType)) {
             compactType = CompactType.NORMAL;
         }
@@ -681,7 +677,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean majorCompactRegion(String regionName, String columnFamily) {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
             admin.majorCompactRegion(Bytes.toBytes(regionName), Bytes.toBytes(columnFamily));
             return Boolean.TRUE;
@@ -698,7 +694,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean compactRegionServer(String serverName) {
-        Assert.notBlank(serverName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "serverName"));
+        Assert.notBlank(serverName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "serverName"));
         try {
             admin.compactRegionServer(ServerName.valueOf(serverName));
             return Boolean.TRUE;
@@ -715,7 +711,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean majorCompactRegionServer(String serverName) {
-        Assert.notBlank(serverName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "serverName"));
+        Assert.notBlank(serverName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "serverName"));
         try {
             admin.majorCompactRegionServer(ServerName.valueOf(serverName));
             return Boolean.TRUE;
@@ -732,7 +728,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean assignRegion(String regionName) {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
             admin.assign(Bytes.toBytes(regionName));
             return Boolean.TRUE;
@@ -749,7 +745,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean unassignRegion(String regionName) {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
             admin.unassign(Bytes.toBytes(regionName));
             return Boolean.TRUE;
@@ -810,9 +806,9 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean moveRegion(String regionName, String destServerName) {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         RegionInfo regionInfo = getRegion(regionName);
-        Assert.notNull(regionInfo, ExceptionEnum.getException(ExceptionEnum.SPECIFIED_VALUE, regionName));
+        Assert.notNull(regionInfo, HbaseExceptionEnum.getException(HbaseExceptionEnum.SPECIFIED_VALUE, regionName));
         try {
             admin.move(regionInfo.getEncodedNameAsBytes(), StrUtil.isBlank(destServerName) ? null : ServerName.valueOf(destServerName));
             return Boolean.TRUE;
@@ -829,9 +825,9 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean offlineRegion(String regionName) {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         RegionInfo regionInfo = getRegion(regionName);
-        Assert.notNull(regionInfo, ExceptionEnum.getException(ExceptionEnum.SPECIFIED_VALUE, regionName));
+        Assert.notNull(regionInfo, HbaseExceptionEnum.getException(HbaseExceptionEnum.SPECIFIED_VALUE, regionName));
         try {
             admin.offline(Bytes.toBytes(regionName));
             return Boolean.TRUE;
@@ -850,7 +846,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean mergeRegions(List<String> regionNames, boolean forcible) {
-        Assert.notEmpty(regionNames, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionNames"));
+        Assert.notEmpty(regionNames, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionNames"));
 
         List<byte[]> regions = CollectionUtil.newArrayList();
         for (String regionName : regionNames) {
@@ -877,7 +873,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean createNamespace(String name) {
-        Assert.notBlank(name, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "name"));
+        Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
 
         NamespaceDescriptor namespaceDescriptor = NamespaceDescriptor.create(name).build();
         try {
@@ -897,7 +893,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean createNamespace(String name, Map<String, String> configuration) {
-        Assert.notBlank(name, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "name"));
+        Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
 
         NamespaceDescriptor namespaceDescriptor = NamespaceDescriptor.create(name).addConfiguration(configuration).build();
         try {
@@ -916,7 +912,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean modifyNamespace(String name, Map<String, String> configuration) {
-        Assert.notBlank(name, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "name"));
+        Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
         NamespaceDescriptor namespaceDescriptor = NamespaceDescriptor.create(name).addConfiguration(configuration).build();
         try {
             admin.modifyNamespace(namespaceDescriptor);
@@ -936,7 +932,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean modifyNamespace(String name, String key, String value) {
-        Assert.notBlank(name, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "name"));
+        Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
         NamespaceDescriptor namespaceDescriptor = NamespaceDescriptor.create(name).addConfiguration(key, value).build();
         try {
             admin.modifyNamespace(namespaceDescriptor);
@@ -954,7 +950,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean deleteNamespace(String name) {
-        Assert.notBlank(name, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "name"));
+        Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
         try {
             admin.deleteNamespace(name);
             return Boolean.TRUE;
@@ -972,7 +968,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean deleteNamespace(String name, String  key) {
-        Assert.notBlank(name, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "name"));
+        Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
         NamespaceDescriptor namespaceDescriptor = NamespaceDescriptor.create(name).removeConfiguration(key).build();
         try {
             admin.modifyNamespace(namespaceDescriptor);
@@ -991,7 +987,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @throws HbaseException hbase异常
      */
     public NamespaceDescriptor getNamespaceDescriptor(String name) throws HbaseException {
-        Assert.notBlank(name, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "name"));
+        Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
         try {
             return admin.getNamespaceDescriptor(name);
         } catch (Exception e) {
@@ -1035,7 +1031,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link TableDescriptor}>
      */
     public List<TableDescriptor> getTableDescriptorsByNamespace(String name) {
-        Assert.notBlank(name, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "name"));
+        Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
         try {
             return admin.listTableDescriptorsByNamespace(Bytes.toBytes(name));
         } catch (Exception e) {
@@ -1051,7 +1047,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link TableName}>
      */
     public List<TableName> getTableNamesByNamespace(String name) {
-        Assert.notBlank(name, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "name"));
+        Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
         try {
             return CollectionUtil.newArrayList(admin.listTableNamesByNamespace(name));
         } catch (Exception e) {
@@ -1067,7 +1063,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link TableDescriptor}>
      */
     public List<TableDescriptor> getTableDescriptors(List<String> tableNames) {
-        Assert.notEmpty(tableNames, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableNames"));
+        Assert.notEmpty(tableNames, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableNames"));
 
         List<TableName> names = tableNames.stream().map(TableName::valueOf).collect(Collectors.toList());
         try {
@@ -1096,8 +1092,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link CompactionState}
      */
     public CompactionState getCompactionStateByTable(String tableName, CompactType compactType) throws HbaseException {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.isTrue(tableExists(tableName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, tableName));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.isTrue(tableExists(tableName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, tableName));
 
         try {
             return admin.getCompactionState(TableName.valueOf(tableName), compactType);
@@ -1115,8 +1111,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @throws HbaseException hbase异常
      */
     public CompactionState getCompactionStateByRegion(String regionName) throws HbaseException {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
-        Assert.notNull(getRegion(regionName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, regionName));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notNull(getRegion(regionName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, regionName));
 
         try {
             return admin.getCompactionStateForRegion(Bytes.toBytes(regionName));
@@ -1134,7 +1130,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Long}
      */
     public Long getLastMajorCompactionTimestampByTable(String tableName) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (tableExists(tableName)) {
             try {
                 return admin.getLastMajorCompactionTimestamp(TableName.valueOf(tableName));
@@ -1152,7 +1148,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Long}
      */
     public Long getLastMajorCompactionTimestampByRegion(String regionName) {
-        Assert.notBlank(regionName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "regionName"));
+        Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         if (ObjectUtil.isNotNull(getRegion(regionName))) {
             try {
                 return admin.getLastMajorCompactionTimestampForRegion(Bytes.toBytes(regionName));
@@ -1196,8 +1192,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean createSnapshot(String snapshotName, String tableName, SnapshotType type, Map<String, Object> snapshotProps) {
-        Assert.notBlank(snapshotName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshotName"));
-        Assert.isTrue(tableExists(tableName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, tableName));
+        Assert.notBlank(snapshotName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshotName"));
+        Assert.isTrue(tableExists(tableName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, tableName));
 
         try {
             admin.snapshot(snapshotName, TableName.valueOf(tableName), type, snapshotProps);
@@ -1227,7 +1223,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean createSnapshot(SnapshotDescription snapshot) {
-        Assert.notNull(snapshot, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshot"));
+        Assert.notNull(snapshot, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshot"));
         try {
             admin.snapshot(snapshot);
             return Boolean.TRUE;
@@ -1244,7 +1240,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean isSnapshotFinished(String snapshotName) {
-        Assert.notNull(snapshotName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshotName"));
+        Assert.notNull(snapshotName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshotName"));
         SnapshotDescription snapshotDescription = new SnapshotDescription(snapshotName);
         return isSnapshotFinished(snapshotDescription);
     }
@@ -1268,9 +1264,9 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean isSnapshotFinished(String snapshotName, String tableName, SnapshotType type) {
-        Assert.notNull(snapshotName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshotName"));
-        Assert.notNull(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.isTrue(tableExists(tableName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, tableName));
+        Assert.notNull(snapshotName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshotName"));
+        Assert.notNull(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.isTrue(tableExists(tableName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, tableName));
 
         SnapshotDescription snapshotDescription = new SnapshotDescription(snapshotName, TableName.valueOf(tableName), type);
         return isSnapshotFinished(snapshotDescription);
@@ -1283,7 +1279,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean isSnapshotFinished(SnapshotDescription snapshot) {
-        Assert.notNull(snapshot, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshot"));
+        Assert.notNull(snapshot, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshot"));
         try {
             return admin.isSnapshotFinished(snapshot);
         } catch (IOException e) {
@@ -1325,7 +1321,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean restoreSnapshot(String snapshotName, boolean takeFailSafeSnapshot, boolean restoreAcl) {
-        Assert.notNull(snapshotName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshotName"));
+        Assert.notNull(snapshotName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshotName"));
         try {
             admin.restoreSnapshot(snapshotName, takeFailSafeSnapshot, restoreAcl);
             return Boolean.TRUE;
@@ -1345,8 +1341,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean cloneSnapshot(String snapshotName, String tableName, boolean restoreAcl, String customSFT) {
-        Assert.notBlank(snapshotName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshotName"));
-        Assert.isTrue(tableExists(tableName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, tableName));
+        Assert.notBlank(snapshotName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshotName"));
+        Assert.isTrue(tableExists(tableName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, tableName));
 
         try {
             admin.cloneSnapshot(snapshotName, TableName.valueOf(tableName), restoreAcl, customSFT);
@@ -1401,7 +1397,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link SnapshotDescription}
      */
     public SnapshotDescription getSnapshot(String snapshotName) {
-        Assert.notNull(snapshotName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshotName"));
+        Assert.notNull(snapshotName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshotName"));
 
         List<SnapshotDescription> snapshotDescriptions = getSnapshots();
         if (CollectionUtil.isNotEmpty(snapshotDescriptions)) {
@@ -1419,7 +1415,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link SnapshotDescription}>
      */
     public List<SnapshotDescription> getSnapshots(Pattern pattern) {
-        Assert.notNull(pattern, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "pattern"));
+        Assert.notNull(pattern, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "pattern"));
         try {
             return admin.listSnapshots(pattern);
         } catch (IOException e) {
@@ -1436,8 +1432,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link SnapshotDescription}>
      */
     public List<SnapshotDescription> getTableSnapshots(Pattern tableNamePattern, Pattern snapshotNamePattern) {
-        Assert.notNull(tableNamePattern, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableNamePattern"));
-        Assert.notNull(snapshotNamePattern, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshotNamePattern"));
+        Assert.notNull(tableNamePattern, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableNamePattern"));
+        Assert.notNull(snapshotNamePattern, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshotNamePattern"));
 
         try {
             return admin.listTableSnapshots(tableNamePattern, snapshotNamePattern);
@@ -1454,8 +1450,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link List}<{@link SnapshotDescription}>
      */
     public List<SnapshotDescription> getTableSnapshots(String tableName) {
-        Assert.notNull(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.isTrue(tableExists(tableName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, tableName));
+        Assert.notNull(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.isTrue(tableExists(tableName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, tableName));
 
         List<SnapshotDescription> snapshotDescriptions = getSnapshots();
         if (CollectionUtil.isNotEmpty(snapshotDescriptions)) {
@@ -1473,7 +1469,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean deleteSnapshot(String snapshotName) {
-        Assert.notNull(snapshotName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshotName"));
+        Assert.notNull(snapshotName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshotName"));
         if (ObjectUtil.isEmpty(getSnapshot(snapshotName))) return Boolean.TRUE;
         try {
             admin.deleteSnapshot(snapshotName);
@@ -1491,7 +1487,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean deleteSnapshots(Pattern pattern) {
-        Assert.notNull(pattern, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "pattern"));
+        Assert.notNull(pattern, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "pattern"));
         try {
             admin.deleteSnapshots(pattern);
             return Boolean.TRUE;
@@ -1509,8 +1505,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean deleteTableSnapshots(Pattern tableNamePattern, Pattern snapshotNamePattern) {
-        Assert.notNull(tableNamePattern, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableNamePattern"));
-        Assert.notNull(snapshotNamePattern, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "snapshotNamePattern"));
+        Assert.notNull(tableNamePattern, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableNamePattern"));
+        Assert.notNull(snapshotNamePattern, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "snapshotNamePattern"));
         try {
             admin.deleteTableSnapshots(tableNamePattern, snapshotNamePattern);
             return Boolean.TRUE;
@@ -1526,8 +1522,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @param tableName    表名
      */
     public void deleteTableSnapshots(String tableName) {
-        Assert.notNull(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.isTrue(tableExists(tableName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, tableName));
+        Assert.notNull(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.isTrue(tableExists(tableName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, tableName));
 
         List<SnapshotDescription> tableSnapshots = getTableSnapshots(tableName);
         if (CollectionUtil.isNotEmpty(tableSnapshots)) {
@@ -1542,8 +1538,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean enableTableReplication(String tableName) {
-        Assert.notNull(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.isTrue(tableExists(tableName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, tableName));
+        Assert.notNull(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.isTrue(tableExists(tableName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, tableName));
         try {
             admin.enableTableReplication(TableName.valueOf(tableName));
             return Boolean.TRUE;
@@ -1561,8 +1557,8 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean disableTableReplication(String tableName) {
-        Assert.notNull(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.isTrue(tableExists(tableName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, tableName));
+        Assert.notNull(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.isTrue(tableExists(tableName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, tableName));
         try {
             admin.disableTableReplication(TableName.valueOf(tableName));
             return Boolean.TRUE;
@@ -1581,9 +1577,9 @@ public class HbaseTemplate implements HbaseOperations {
      * @return {@link Boolean}
      */
     public Boolean cloneTable(String tableName, String newTableName, boolean preserveSplits) {
-        Assert.notNull(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notNull(newTableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "newTableName"));
-        Assert.isTrue(tableExists(tableName), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, tableName));
+        Assert.notNull(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notNull(newTableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "newTableName"));
+        Assert.isTrue(tableExists(tableName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, tableName));
         try {
             admin.cloneTableSchema(TableName.valueOf(tableName), TableName.valueOf(newTableName), preserveSplits);
             return Boolean.TRUE;
@@ -1601,7 +1597,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @throws HbaseException hbase异常
      */
     public Table getTable(String tableName) throws HbaseException {
-        Assert.notNull(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notNull(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         try {
             return connection.getTable(TableName.valueOf(tableName));
         } catch (IOException e) {
@@ -1758,11 +1754,11 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public void put(String tableName, String rowName, String familyName, String qualifier, byte[] data) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notBlank(rowName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "rowName"));
-        Assert.notBlank(familyName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "familyName"));
-        Assert.notBlank(qualifier, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "qualifier"));
-        Assert.isTrue(ArrayUtil.isNotEmpty(data), ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "data"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(rowName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowName"));
+        Assert.notBlank(familyName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "familyName"));
+        Assert.notBlank(qualifier, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "qualifier"));
+        Assert.isTrue(ArrayUtil.isNotEmpty(data), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "data"));
 
         this.execute(tableName, new TableCallback<Void>() {
             @Override
@@ -1786,9 +1782,9 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public void delete(String tableName, String rowName, String columnFamily, String qualifier) {
-        Assert.notBlank(tableName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notBlank(rowName, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "rowName"));
-        Assert.notBlank(columnFamily, ExceptionEnum.getException(ExceptionEnum.GIVEN_VALUE, "columnFamily"));
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notBlank(rowName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowName"));
+        Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
 
         execute(tableName, new TableCallback<Void>() {
             @Override

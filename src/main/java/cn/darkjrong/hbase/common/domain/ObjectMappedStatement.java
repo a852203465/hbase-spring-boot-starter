@@ -55,7 +55,7 @@ public class ObjectMappedStatement implements Serializable {
     /**
      * 属性集合, key: 字段名, value: 字段属性
      */
-    private Map<String, ObjectProperty> properties;
+    private Map<String, ObjectProperty> columns;
 
 
 

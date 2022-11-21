@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.config;
+package cn.darkjrong.hbase.factory;
 
 import cn.darkjrong.hbase.common.domain.ObjectMappedStatement;
 import cn.hutool.core.map.MapUtil;

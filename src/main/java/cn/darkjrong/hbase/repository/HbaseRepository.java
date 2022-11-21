@@ -1,5 +1,7 @@
 package cn.darkjrong.hbase.repository;
 
+import java.util.List;
+
 /**
  * hbase 持久层接口
  *
@@ -16,7 +18,12 @@ public interface HbaseRepository<T, ID> {
      */
     <S extends T> S save(S entity);
 
-
+    /**
+     * 查询所有
+     *
+     * @return {@link List}<{@link T}>
+     */
+    List<T> findAll();
 
 
 

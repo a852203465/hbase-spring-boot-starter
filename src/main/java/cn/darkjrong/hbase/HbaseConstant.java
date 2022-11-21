@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.constants;
+package cn.darkjrong.hbase;
 
 /**
  * hbase常数

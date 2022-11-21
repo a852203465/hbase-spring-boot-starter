@@ -1,6 +1,6 @@
 package cn.darkjrong.hbase.common.callback;
 
-import cn.darkjrong.hbase.common.exceptions.HbaseException;
+import cn.darkjrong.hbase.HbaseException;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import org.apache.hadoop.hbase.client.Result;

@@ -1,6 +1,6 @@
 package cn.darkjrong.hbase.common.annotation;
 
-import cn.darkjrong.hbase.common.constants.HbaseConstant;
+import cn.darkjrong.hbase.HbaseConstant;
 import org.springframework.core.annotation.AliasFor;
 
 import java.lang.annotation.*;

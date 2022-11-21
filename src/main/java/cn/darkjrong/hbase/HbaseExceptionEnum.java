@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.enums;
+package cn.darkjrong.hbase;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum ExceptionEnum {
+public enum HbaseExceptionEnum {
 
     // 给定的值不能为空
     GIVEN_VALUE("The given 【%s】 must not be null!"),
@@ -37,12 +37,12 @@ public enum ExceptionEnum {
     /**
      * 获取异常
      *
-     * @param exceptionEnum 异常枚举
+     * @param hbaseExceptionEnum 异常枚举
      * @param args          arg
      * @return {@link String}
      */
-    public static String getException(ExceptionEnum exceptionEnum, Object... args) {
-        return String.format(exceptionEnum.getValue(), args);
+    public static String getException(HbaseExceptionEnum hbaseExceptionEnum, Object... args) {
+        return String.format(hbaseExceptionEnum.getValue(), args);
     }
 
 
