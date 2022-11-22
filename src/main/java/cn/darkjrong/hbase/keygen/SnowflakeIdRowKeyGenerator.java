@@ -23,7 +23,7 @@ public class SnowflakeIdRowKeyGenerator extends AbstractRowKeyGenerator {
         }
         if (Number.class.isAssignableFrom(field.getType())) {
             ReflectUtil.setFieldValue(paramObj, field, IdUtil.getSnowflakeNextId());
-        }else if (field.getType().isAssignableFrom(String.class)) {
+        }else if (String.class.isAssignableFrom(field.getType())) {
             ReflectUtil.setFieldValue(paramObj, field, IdUtil.getSnowflakeNextIdStr());
         }
     }
@@ -39,7 +39,7 @@ public class SnowflakeIdRowKeyGenerator extends AbstractRowKeyGenerator {
         if (ReflectUtil.getFieldValue(paramObj, field) == null) {
             if (Number.class.isAssignableFrom(field.getType())) {
                 ReflectUtil.setFieldValue(paramObj, field, IdUtil.getSnowflakeNextId());
-            }else if (field.getType().isAssignableFrom(String.class)) {
+            }else if (String.class.isAssignableFrom(field.getType())) {
                 ReflectUtil.setFieldValue(paramObj, field, IdUtil.getSnowflakeNextIdStr());
             }
         }

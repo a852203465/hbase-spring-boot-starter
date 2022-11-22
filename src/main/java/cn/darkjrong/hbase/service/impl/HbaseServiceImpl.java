@@ -8,7 +8,6 @@ import cn.darkjrong.hbase.factory.ObjectMappedFactory;
 import cn.darkjrong.hbase.factory.RowKeyGeneratorFactory;
 import cn.darkjrong.hbase.service.HbaseService;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
 import org.apache.hadoop.hbase.client.Mutation;
@@ -95,7 +94,7 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
     @Override
     public Optional<T> findById(ID id) {
         ObjectMappedStatement statement = currentStatement();
-        return Optional.of(hbaseTemplate.get(statement.getTableName(), Convert.toStr(id), statement.getColumnFamily(), new RowMapper<T>() {
+        return Optional.of(hbaseTemplate.get(statement.getTableName(), id, statement.getColumnFamily(), new RowMapper<T>() {
             @Override
             public T mapRow(Result result, int rowNum) {
                 return HbaseUtils.objectParse(targetClass, result, currentStatement());

@@ -21,7 +21,7 @@ public class StringUUIDRowKeyGenerator extends AbstractRowKeyGenerator {
             defaultGeneratorKey(paramObj);
             return;
         }
-        if (!field.getType().isAssignableFrom(String.class)) {
+        if (!String.class.isAssignableFrom(field.getType())) {
             throw new IllegalArgumentException("主键策略UUID==》对应主键属性类型必须为String");
         }
         ReflectUtil.setFieldValue(paramObj, field, IdUtil.fastSimpleUUID());
@@ -36,7 +36,7 @@ public class StringUUIDRowKeyGenerator extends AbstractRowKeyGenerator {
     protected void defaultGeneratorKey(Object paramObj) {
         Field field = ReflectUtil.getField(paramObj.getClass(), HbaseConstant.ID);
         if (ReflectUtil.getFieldValue(paramObj, field) == null) {
-            if (!field.getType().isAssignableFrom(String.class)) {
+            if (!String.class.isAssignableFrom(field.getType())) {
                 throw new IllegalArgumentException("主键策略UUID==》对应主键属性类型必须为String");
             }
             ReflectUtil.setFieldValue(paramObj, field, IdUtil.fastSimpleUUID());

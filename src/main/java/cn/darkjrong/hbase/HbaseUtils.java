@@ -34,7 +34,9 @@ public class HbaseUtils {
      * @param scanner 结果扫描器
      */
     public static void close(ResultScanner scanner) {
-        if (ObjectUtil.isNotNull(scanner)) scanner.close();
+        if (ObjectUtil.isNotNull(scanner)) {
+            scanner.close();
+        }
     }
 
     /**
@@ -79,6 +81,8 @@ public class HbaseUtils {
             return toStr(data);
         }else if (tClass.equals(int.class) || tClass.equals(Integer.class)) {
             return Convert.toInt(data);
+        }else if (tClass.equals(Long.class) || tClass.equals(long.class)) {
+            return Convert.toLong(data);
         }else if (tClass.equals(double.class) || tClass.equals(Double.class)) {
             return Convert.toDouble(data);
         }else if (tClass.equals(float.class) || tClass.equals(Float.class)) {
@@ -108,6 +112,8 @@ public class HbaseUtils {
             return Bytes.toString(data, offset, length);
         }else if (tClass.equals(int.class) || tClass.equals(Integer.class)) {
             return Convert.toInt(data);
+        }else if (tClass.equals(Long.class) || tClass.equals(long.class)) {
+            return Convert.toLong(data);
         }else if (tClass.equals(double.class) || tClass.equals(Double.class)) {
             return Convert.toDouble(data);
         }else if (tClass.equals(float.class) || tClass.equals(Float.class)) {
@@ -165,10 +171,12 @@ public class HbaseUtils {
      * @return {@link byte[]}
      */
     public static byte[] toBytes(Class<?> clazz, Object key) {
-        if (clazz.isAssignableFrom(Number.class)) {
+        if (Number.class.isAssignableFrom(clazz)) {
             return ByteUtil.numberToBytes((Number) key);
-        } else {
+        } else if (String.class.isAssignableFrom(clazz)){
             return StrUtil.bytes((String) key);
+        }else {
+            return Convert.toPrimitiveByteArray(key);
         }
     }
 
