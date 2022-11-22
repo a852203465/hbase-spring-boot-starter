@@ -142,6 +142,11 @@ public class HbaseUtils {
         if (ArrayUtil.isNotEmpty(result.rawCells())) {
             T instance = ReflectUtil.newInstance(clazz);
             Map<String, ObjectProperty> properties = statement.getColumns();
+
+            for (Map.Entry<String, ObjectProperty> entry : properties.entrySet()) {
+                System.out.println(toStr(result.getValue(statement.getColumnFamilyBytes(), toBytes(entry.getKey()))));
+            }
+
             for(Cell cell : result.rawCells()) {
                 String qualifier = Bytes.toString(cell.getQualifierArray(),cell.getQualifierOffset(),cell.getQualifierLength());
                 Object value = HbaseUtils.getValue(properties.get(qualifier).getType(), cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
@@ -181,12 +186,21 @@ public class HbaseUtils {
     }
 
     /**
+     *将{@link String}转换为 {@link byte[]}
+     * @param value {@link String}
+     * @return {@link byte[]}
+     */
+    public static byte[] toBytes(String value) {
+       return StrUtil.bytes(value);
+    }
+
+    /**
      * 将{@link byte[]}转换为 {@link String}
      * @param bytes {@link String}
      * @return {@link byte[]}
      */
     public static String toStr(byte[] bytes) {
-        return Convert.toStr(bytes);
+        return new String(bytes);
     }
 
 
