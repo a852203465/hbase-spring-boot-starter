@@ -3,9 +3,9 @@ package cn.darkjrong.hbase;
 import cn.darkjrong.hbase.domain.ObjectMappedStatement;
 import cn.darkjrong.hbase.domain.ObjectProperty;
 import cn.darkjrong.hbase.enums.HbaseExceptionEnum;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.BufferedMutator;
@@ -15,6 +15,7 @@ import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Map;
 
@@ -75,21 +76,21 @@ public class HbaseUtils {
      */
     public static Object getValue(Class<?> tClass, byte[] data) {
         if (tClass.equals(String.class)) {
-            return Bytes.toString(data);
+            return toStr(data);
         }else if (tClass.equals(int.class) || tClass.equals(Integer.class)) {
-            return Bytes.toInt(data);
+            return Convert.toInt(data);
         }else if (tClass.equals(double.class) || tClass.equals(Double.class)) {
-            return Bytes.toDouble(data);
+            return Convert.toDouble(data);
         }else if (tClass.equals(float.class) || tClass.equals(Float.class)) {
-            return Bytes.toFloat(data);
+            return Convert.toFloat(data);
         }else if (tClass.equals(BigDecimal.class)) {
-            return Bytes.toBigDecimal(data);
+            return Convert.toBigDecimal(data);
         }else if (tClass.equals(Boolean.class) || tClass.equals(boolean.class)) {
-            return Bytes.toBoolean(data);
+            return Convert.toBool(data);
         }else if (tClass.equals(Short.class) || tClass.equals(short.class)) {
-            return Bytes.toShort(data);
+            return Convert.toShort(data);
         }else {
-            return Bytes.toString(data);
+            return toStr(data);
         }
     }
 
@@ -106,17 +107,17 @@ public class HbaseUtils {
         if (tClass.equals(String.class)) {
             return Bytes.toString(data, offset, length);
         }else if (tClass.equals(int.class) || tClass.equals(Integer.class)) {
-            return Bytes.toInt(data);
+            return Convert.toInt(data);
         }else if (tClass.equals(double.class) || tClass.equals(Double.class)) {
-            return Bytes.toDouble(data);
+            return Convert.toDouble(data);
         }else if (tClass.equals(float.class) || tClass.equals(Float.class)) {
-            return Bytes.toFloat(data);
+            return Convert.toFloat(data);
         }else if (tClass.equals(BigDecimal.class)) {
             return Bytes.toBigDecimal(data, offset, length);
         }else if (tClass.equals(Boolean.class) || tClass.equals(boolean.class)) {
-            return Bytes.toBoolean(data);
+            return Convert.toBool(data);
         }else if (tClass.equals(Short.class) || tClass.equals(short.class)) {
-            return Bytes.toShort(data);
+            return Convert.toShort(data);
         }else {
             return Bytes.toString(data, offset, length);
         }
@@ -132,15 +133,66 @@ public class HbaseUtils {
      */
     public static <T> T objectParse(Class<T> clazz, Result result, ObjectMappedStatement statement) {
         Assert.notNull(statement, HbaseExceptionEnum.getException(HbaseExceptionEnum.MAPPED, clazz.getName()));
-        T instance = ReflectUtil.newInstance(clazz);
-        Map<String, ObjectProperty> properties = statement.getColumns();
-        for(Cell cell : result.rawCells()) {
-            String qualifier = Bytes.toString(cell.getQualifierArray(),cell.getQualifierOffset(),cell.getQualifierLength());
-            Object value = HbaseUtils.getValue(properties.get(qualifier).getType(), cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
-            ReflectUtil.setFieldValue(instance, qualifier, value);
+        if (ArrayUtil.isNotEmpty(result.rawCells())) {
+            T instance = ReflectUtil.newInstance(clazz);
+            Map<String, ObjectProperty> properties = statement.getColumns();
+            for(Cell cell : result.rawCells()) {
+                String qualifier = Bytes.toString(cell.getQualifierArray(),cell.getQualifierOffset(),cell.getQualifierLength());
+                Object value = HbaseUtils.getValue(properties.get(qualifier).getType(), cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
+                ReflectUtil.setFieldValue(instance, qualifier, value);
+            }
+            return instance;
         }
-        return instance;
+        return null;
     }
+
+    /**
+     *将{@link Serializable}转换为 {@link byte[]}
+     * @param serializable {@link Serializable}
+     * @return {@link byte[]}
+     */
+    public static byte[] toBytes(Serializable serializable) {
+        if (serializable instanceof Number) {
+            return ByteUtil.numberToBytes((Number) serializable);
+        } else {
+            return StrUtil.bytes((String) serializable);
+        }
+    }
+
+    /**
+     *将{@link Object}转换为 {@link byte[]}
+     * @param clazz {@link Class<?>}  key的类型
+     * @return {@link byte[]}
+     */
+    public static byte[] toBytes(Class<?> clazz, Object key) {
+        if (clazz.isAssignableFrom(Number.class)) {
+            return ByteUtil.numberToBytes((Number) key);
+        } else {
+            return StrUtil.bytes((String) key);
+        }
+    }
+
+    /**
+     * 将{@link byte[]}转换为 {@link String}
+     * @param bytes {@link String}
+     * @return {@link byte[]}
+     */
+    public static String toStr(byte[] bytes) {
+        return Convert.toStr(bytes);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -7,6 +7,7 @@ import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 行映射结果提取器
@@ -28,7 +29,7 @@ public class RowMapperResultsExtractor<T> implements ResultsExtractor<List<T>> {
         List<T> rs = CollectionUtil.newArrayList();
         int rowNum = 0;
         for (Result result : scanner) {
-            rs.add(rowMapper.mapRow(result, rowNum++));
+            Optional.ofNullable(rowMapper.mapRow(result, rowNum++)).ifPresent(rs::add);
         }
         return rs;
     }

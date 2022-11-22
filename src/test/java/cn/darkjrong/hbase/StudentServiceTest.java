@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
 public class StudentServiceTest extends TestInit {
 
@@ -41,15 +42,13 @@ public class StudentServiceTest extends TestInit {
     @Test
     void save() {
 
-        for (int i = 0; i <10; i++) {
-            Student student = new Student();
-            student.setName("贾荣"+i);
-            student.setEmail("852203465@qq.com"+i);
-            student.setAge(12+i);
-            student.setSex("男"+i);
+        Student student = new Student();
+        student.setName("贾荣"+1000);
+        student.setEmail("852203465@qq.com"+1000);
+        student.setAge(12+1000);
+        student.setSex("男"+1000);
 
-            studentService.save(student);
-        }
+        System.out.println(studentService.save(student));
     }
 
     @Test
@@ -57,6 +56,14 @@ public class StudentServiceTest extends TestInit {
 
         List<Student> students = studentService.findAll();
         System.out.println(JSON.toJSONString(students));
+    }
+
+    @Test
+    void findById() {
+
+        Optional<Student> optional = studentService.findById(5L);
+        System.out.println(optional.get());
+
     }
 
 

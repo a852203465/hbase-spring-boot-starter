@@ -7,6 +7,7 @@ import cn.darkjrong.hbase.callback.RowMapper;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Scan;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -119,64 +120,75 @@ public interface HbaseOperations {
      * 获取行
      *
      * @param tableName 表名
-     * @param rowName   行名称
+     * @param rowKey   行Key
      * @param rowMapper 行映射器
      * @return {@link T}
      */
-    <T> T get(String tableName, String rowName, RowMapper<T> rowMapper);
+    <T> T get(String tableName, String rowKey, RowMapper<T> rowMapper);
 
     /**
      * 获取行
      *
      * @param tableName    表名
-     * @param rowName      行名称
+     * @param rowKey      行Key
      * @param rowMapper       行映射器
      * @param columnFamily 列族
      * @return {@link T}
      */
-    <T> T get(String tableName, String rowName, String columnFamily, RowMapper<T> rowMapper);
+    <T> T get(String tableName, String rowKey, String columnFamily, RowMapper<T> rowMapper);
 
     /**
      * 获取行
      *
      * @param tableName    表名
-     * @param rowName      行名称
+     * @param rowKey      行Key
+     * @param rowMapper       行映射器
+     * @param columnFamily 列族
+     * @return {@link T}
+     */
+    <T, ID extends Serializable> T get(String tableName, ID rowKey, String columnFamily, RowMapper<T> rowMapper);
+
+    /**
+     * 获取行
+     *
+     * @param tableName    表名
+     * @param rowKey      行Key
      * @param rowMapper    行映射器
      * @param columnFamily 列族
      * @param qualifier    字段名
      * @return {@link T}
      */
-    <T> T get(String tableName, String rowName, String columnFamily, String qualifier, RowMapper<T> rowMapper);
+    <T> T get(String tableName, String rowKey, String columnFamily, String qualifier, RowMapper<T> rowMapper);
 
     /**
      * 插入单个数据
      *
      * @param tableName    表名
-     * @param rowName      行名称
+     * @param rowKey      行Key
      * @param qualifier    字段名
      * @param data         数据
      * @param columnFamily 列族
      */
-    void put(String tableName, String rowName, String columnFamily, String qualifier, byte[] data);
+    void put(String tableName, String rowKey, String columnFamily, String qualifier, byte[] data);
 
     /**
      * 删除
      *
      * @param tableName    表名
-     * @param rowName      行名称
+     * @param rowKey      行Key
      * @param columnFamily 列族
      */
-    void delete(String tableName, final String rowName, final String columnFamily);
+    void delete(String tableName, final String rowKey, final String columnFamily);
 
     /**
      * 删除
      *
      * @param tableName    表名
-     * @param rowName      行名称
+     * @param rowKey      行Key
      * @param columnFamily 列族
      * @param qualifier    字段名
      */
-    void delete(String tableName, final String rowName, final String columnFamily, final String qualifier);
+    void delete(String tableName, final String rowKey, final String columnFamily, final String qualifier);
 
     /**
      * 保存或更新

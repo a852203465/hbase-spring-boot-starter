@@ -16,10 +16,10 @@ import org.apache.hadoop.hbase.NamespaceDescriptor;
 import org.apache.hadoop.hbase.ServerName;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.util.StopWatch;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -252,7 +252,7 @@ public class HbaseTemplate implements HbaseOperations {
         }
 
         if (!tableExists(tableName)) {
-            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(columnFamily)).setMaxVersions(1).build();
+            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(HbaseUtils.toBytes(columnFamily)).setMaxVersions(1).build();
             TableDescriptor tableDescriptor = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName)).setColumnFamily(cfd).build();
             try {
                 admin.createTable(tableDescriptor);
@@ -276,10 +276,10 @@ public class HbaseTemplate implements HbaseOperations {
     public Boolean createTable(String tableName, String startKey, String endKey, int numRegions) {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (!tableExists(tableName)) {
-            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(HbaseConstant.DEFAULT_COLUMN_FAMILY)).setMaxVersions(1).build();
+            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(HbaseUtils.toBytes(HbaseConstant.DEFAULT_COLUMN_FAMILY)).setMaxVersions(1).build();
             TableDescriptor tableDescriptor = TableDescriptorBuilder.newBuilder(TableName.valueOf(tableName)).setColumnFamily(cfd).build();
             try {
-                admin.createTable(tableDescriptor, Bytes.toBytes(startKey), Bytes.toBytes(endKey), numRegions);
+                admin.createTable(tableDescriptor, HbaseUtils.toBytes(startKey), HbaseUtils.toBytes(endKey), numRegions);
                 return Boolean.TRUE;
             } catch (Exception e) {
                 log.error("createTable", e);
@@ -413,7 +413,7 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
 
         if (tableExists(tableName)) {
-            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(columnFamily)).setMaxVersions(1).build();
+            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(HbaseUtils.toBytes(columnFamily)).setMaxVersions(1).build();
             try {
                 admin.addColumnFamily(TableName.valueOf(tableName), cfd);
                 return Boolean.TRUE;
@@ -437,7 +437,7 @@ public class HbaseTemplate implements HbaseOperations {
 
         if (tableExists(tableName)) {
             try {
-                admin.deleteColumnFamily(TableName.valueOf(tableName), Bytes.toBytes(columnFamily));
+                admin.deleteColumnFamily(TableName.valueOf(tableName), HbaseUtils.toBytes(columnFamily));
                 return Boolean.TRUE;
             } catch (IOException e) {
                 log.error("deleteColumnFamily", e);
@@ -457,7 +457,7 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
         if (tableExists(tableName)) {
-            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes(columnFamily))
+            ColumnFamilyDescriptor cfd = ColumnFamilyDescriptorBuilder.newBuilder(HbaseUtils.toBytes(columnFamily))
                     .setMaxVersions(1).build();
             try {
                 admin.modifyColumnFamily(TableName.valueOf(tableName), cfd);
@@ -490,7 +490,7 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         if (tableExists(tableName)) {
             try {
-                admin.flush(TableName.valueOf(tableName), StrUtil.isBlank(columnFamily) ? null : Bytes.toBytes(columnFamily));
+                admin.flush(TableName.valueOf(tableName), StrUtil.isBlank(columnFamily) ? null : HbaseUtils.toBytes(columnFamily));
                 return Boolean.TRUE;
             } catch (IOException e) {
                 log.error("flushTable", e);
@@ -518,7 +518,7 @@ public class HbaseTemplate implements HbaseOperations {
     public Boolean flushRegion(String regionName, String columnFamily) {
         Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
-            admin.flushRegion(Bytes.toBytes(regionName), StrUtil.isBlank(columnFamily) ? null : Bytes.toBytes(columnFamily));
+            admin.flushRegion(HbaseUtils.toBytes(regionName), StrUtil.isBlank(columnFamily) ? null : HbaseUtils.toBytes(columnFamily));
             return Boolean.TRUE;
         } catch (IOException e) {
             log.error("flushRegion", e);
@@ -577,7 +577,7 @@ public class HbaseTemplate implements HbaseOperations {
             compactType = CompactType.NORMAL;
         }
         try {
-            admin.compact(TableName.valueOf(tableName), Bytes.toBytes(columnFamily), compactType);
+            admin.compact(TableName.valueOf(tableName), HbaseUtils.toBytes(columnFamily), compactType);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("compactTable", e);
@@ -605,7 +605,7 @@ public class HbaseTemplate implements HbaseOperations {
     public Boolean compactRegion(String regionName, String columnFamily) {
         Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
-            admin.compactRegion(Bytes.toBytes(regionName), Bytes.toBytes(columnFamily));
+            admin.compactRegion(HbaseUtils.toBytes(regionName), HbaseUtils.toBytes(columnFamily));
             return Boolean.TRUE;
         } catch (IOException e) {
             log.error("compactRegion", e);
@@ -648,7 +648,7 @@ public class HbaseTemplate implements HbaseOperations {
             compactType = CompactType.NORMAL;
         }
         try {
-            admin.majorCompact(TableName.valueOf(tableName), Bytes.toBytes(columnFamily), compactType);
+            admin.majorCompact(TableName.valueOf(tableName), HbaseUtils.toBytes(columnFamily), compactType);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("majorCompactTable", e);
@@ -676,7 +676,7 @@ public class HbaseTemplate implements HbaseOperations {
     public Boolean majorCompactRegion(String regionName, String columnFamily) {
         Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
-            admin.majorCompactRegion(Bytes.toBytes(regionName), Bytes.toBytes(columnFamily));
+            admin.majorCompactRegion(HbaseUtils.toBytes(regionName), HbaseUtils.toBytes(columnFamily));
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("majorCompactRegion", e);
@@ -727,7 +727,7 @@ public class HbaseTemplate implements HbaseOperations {
     public Boolean assignRegion(String regionName) {
         Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
-            admin.assign(Bytes.toBytes(regionName));
+            admin.assign(HbaseUtils.toBytes(regionName));
             return Boolean.TRUE;
         } catch (IOException e) {
             log.error("assignRegion", e);
@@ -744,7 +744,7 @@ public class HbaseTemplate implements HbaseOperations {
     public Boolean unassignRegion(String regionName) {
         Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         try {
-            admin.unassign(Bytes.toBytes(regionName));
+            admin.unassign(HbaseUtils.toBytes(regionName));
             return Boolean.TRUE;
         } catch (IOException e) {
             log.error("unassignRegion", e);
@@ -826,7 +826,7 @@ public class HbaseTemplate implements HbaseOperations {
         RegionInfo regionInfo = getRegion(regionName);
         Assert.notNull(regionInfo, HbaseExceptionEnum.getException(HbaseExceptionEnum.SPECIFIED_VALUE, regionName));
         try {
-            admin.offline(Bytes.toBytes(regionName));
+            admin.offline(HbaseUtils.toBytes(regionName));
             return Boolean.TRUE;
         } catch (IOException e) {
             log.error("offlineRegion", e);
@@ -1030,7 +1030,7 @@ public class HbaseTemplate implements HbaseOperations {
     public List<TableDescriptor> getTableDescriptorsByNamespace(String name) {
         Assert.notBlank(name, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "name"));
         try {
-            return admin.listTableDescriptorsByNamespace(Bytes.toBytes(name));
+            return admin.listTableDescriptorsByNamespace(HbaseUtils.toBytes(name));
         } catch (Exception e) {
             log.error("getTableDescriptorsByNamespace", e);
         }
@@ -1112,7 +1112,7 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notNull(getRegion(regionName), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, regionName));
 
         try {
-            return admin.getCompactionStateForRegion(Bytes.toBytes(regionName));
+            return admin.getCompactionStateForRegion(HbaseUtils.toBytes(regionName));
         } catch (Exception e) {
             log.error("getCompactionStateByRegion", e);
             throw new HbaseException(e);
@@ -1148,7 +1148,7 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notBlank(regionName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "regionName"));
         if (ObjectUtil.isNotNull(getRegion(regionName))) {
             try {
-                return admin.getLastMajorCompactionTimestampForRegion(Bytes.toBytes(regionName));
+                return admin.getLastMajorCompactionTimestampForRegion(HbaseUtils.toBytes(regionName));
             } catch (IOException e) {
                 log.error("getLastMajorCompactionTimestampByRegion", e);
             }
@@ -1662,14 +1662,14 @@ public class HbaseTemplate implements HbaseOperations {
     @Override
     public <T> T find(String tableName, String columnFamily, ResultsExtractor<T> extractor) {
         Scan scan = new Scan();
-        scan.addFamily(Bytes.toBytes(columnFamily));
+        scan.addFamily(HbaseUtils.toBytes(columnFamily));
         return find(tableName, scan, extractor);
     }
 
     @Override
     public <T> T find(String tableName, String columnFamily, String qualifier, ResultsExtractor<T> extractor) {
         Scan scan = new Scan();
-        scan.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(qualifier));
+        scan.addColumn(HbaseUtils.toBytes(columnFamily), HbaseUtils.toBytes(qualifier));
         return find(tableName, scan, extractor);
     }
 
@@ -1700,14 +1700,14 @@ public class HbaseTemplate implements HbaseOperations {
     @Override
     public <T> List<T> find(String tableName, String columnFamily, RowMapper<T> action) {
         Scan scan = new Scan();
-        scan.addFamily(Bytes.toBytes(columnFamily));
+        scan.addFamily(HbaseUtils.toBytes(columnFamily));
         return find(tableName, scan, action);
     }
 
     @Override
     public <T> List<T> find(String tableName, String columnFamily, String qualifier, RowMapper<T> action) {
         Scan scan = new Scan();
-        scan.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(qualifier));
+        scan.addColumn(HbaseUtils.toBytes(columnFamily), HbaseUtils.toBytes(qualifier));
         return find(tableName, scan, action);
     }
 
@@ -1717,25 +1717,46 @@ public class HbaseTemplate implements HbaseOperations {
     }
 
     @Override
-    public <T> T get(String tableName, String rowName, RowMapper<T> action) {
-        return get(tableName, rowName, null, null, action);
+    public <T> T get(String tableName, String rowKey, RowMapper<T> action) {
+        return get(tableName, rowKey, null, null, action);
     }
 
     @Override
-    public <T> T get(String tableName, String rowName, String columnFamily, RowMapper<T> action) {
-        return get(tableName, rowName, columnFamily, null, action);
+    public <T> T get(String tableName, String rowKey, String columnFamily, RowMapper<T> action) {
+        return get(tableName, rowKey, columnFamily, null, action);
     }
 
     @Override
-    public <T> T get(String tableName, String rowName, String columnFamily, String qualifier, RowMapper<T> action) {
+    public <T, ID extends Serializable> T get(String tableName, ID rowKey, String columnFamily, RowMapper<T> rowMapper) {
         return execute(tableName, new TableCallback<T>() {
             @Override
             public T doInTable(Table table) {
-                Get get = new Get(Bytes.toBytes(rowName));
+                Get get = new Get(HbaseUtils.toBytes(rowKey));
                 if (StrUtil.isNotBlank(columnFamily)) {
-                    byte[] family = Bytes.toBytes(columnFamily);
+                    byte[] family = HbaseUtils.toBytes(columnFamily);
+                    get.addFamily(family);
+                }
+                try {
+                    Result result = table.get(get);
+                    return rowMapper.mapRow(result, 0);
+                } catch (IOException e) {
+                    log.error("get", e);
+                    throw new HbaseException(e);
+                }
+            }
+        });
+    }
+
+    @Override
+    public <T> T get(String tableName, String rowKey, String columnFamily, String qualifier, RowMapper<T> action) {
+        return execute(tableName, new TableCallback<T>() {
+            @Override
+            public T doInTable(Table table) {
+                Get get = new Get(HbaseUtils.toBytes(rowKey));
+                if (StrUtil.isNotBlank(columnFamily)) {
+                    byte[] family = HbaseUtils.toBytes(columnFamily);
                     if (StrUtil.isNotBlank(qualifier)) {
-                        get.addColumn(family, Bytes.toBytes(qualifier));
+                        get.addColumn(family, HbaseUtils.toBytes(qualifier));
                     } else {
                         get.addFamily(family);
                     }
@@ -1752,9 +1773,9 @@ public class HbaseTemplate implements HbaseOperations {
     }
 
     @Override
-    public void put(String tableName, String rowName, String familyName, String qualifier, byte[] data) {
+    public void put(String tableName, String rowKey, String familyName, String qualifier, byte[] data) {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notBlank(rowName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowName"));
+        Assert.notBlank(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
         Assert.notBlank(familyName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "familyName"));
         Assert.notBlank(qualifier, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "qualifier"));
         Assert.isTrue(ArrayUtil.isNotEmpty(data), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "data"));
@@ -1762,7 +1783,7 @@ public class HbaseTemplate implements HbaseOperations {
         this.execute(tableName, new TableCallback<Void>() {
             @Override
             public Void doInTable(Table table) {
-                Put put = new Put(Bytes.toBytes(rowName)).addColumn(Bytes.toBytes(familyName), Bytes.toBytes(qualifier), data);
+                Put put = new Put(HbaseUtils.toBytes(rowKey)).addColumn(HbaseUtils.toBytes(familyName), HbaseUtils.toBytes(qualifier), data);
                 try {
                     table.put(put);
                     return null;
@@ -1775,23 +1796,23 @@ public class HbaseTemplate implements HbaseOperations {
     }
 
     @Override
-    public void delete(String tableName, String rowName, String columnFamily) {
-        this.delete(tableName, rowName, columnFamily, null);
+    public void delete(String tableName, String rowKey, String columnFamily) {
+        this.delete(tableName, rowKey, columnFamily, null);
     }
 
     @Override
-    public void delete(String tableName, String rowName, String columnFamily, String qualifier) {
+    public void delete(String tableName, String rowKey, String columnFamily, String qualifier) {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notBlank(rowName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowName"));
+        Assert.notBlank(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
         Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
 
         execute(tableName, new TableCallback<Void>() {
             @Override
             public Void doInTable(Table table) {
-                Delete delete = new Delete(Bytes.toBytes(rowName));
-                byte[] family = Bytes.toBytes(columnFamily);
+                Delete delete = new Delete(HbaseUtils.toBytes(rowKey));
+                byte[] family = HbaseUtils.toBytes(columnFamily);
                 if (StrUtil.isNotBlank(qualifier)) {
-                    delete.addColumn(family, Bytes.toBytes(qualifier));
+                    delete.addColumn(family, HbaseUtils.toBytes(qualifier));
                 } else {
                     delete.addFamily(family);
                 }

@@ -1,6 +1,7 @@
 package cn.darkjrong.hbase.factory;
 
 import cn.darkjrong.hbase.HbaseConstant;
+import cn.darkjrong.hbase.HbaseUtils;
 import cn.darkjrong.hbase.annotation.ColumnName;
 import cn.darkjrong.hbase.annotation.MappedScan;
 import cn.darkjrong.hbase.annotation.TableId;
@@ -16,7 +17,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -103,10 +103,10 @@ public class ObjectMappedRegistrar implements ImportBeanDefinitionRegistrar, Res
         objectMappedStatement.setId(className);
         String tableName = getTableName(attributes);
         objectMappedStatement.setTableName(tableName);
-        objectMappedStatement.setTableNameBytes(Bytes.toBytes(tableName));
+        objectMappedStatement.setTableNameBytes(HbaseUtils.toBytes(tableName));
         String columnFamily = getColumnFamily(attributes);
         objectMappedStatement.setColumnFamily(columnFamily);
-        objectMappedStatement.setColumnFamilyBytes(Bytes.toBytes(columnFamily));
+        objectMappedStatement.setColumnFamilyBytes(HbaseUtils.toBytes(columnFamily));
         Map<String, ObjectProperty> properties = parseProperties(className);
         ObjectProperty objectProperty = properties.values().stream()
                 .filter(a -> a.getField().isAnnotationPresent(TableId.class))
@@ -148,7 +148,7 @@ public class ObjectMappedRegistrar implements ImportBeanDefinitionRegistrar, Res
                         if (a.isAnnotationPresent(ColumnName.class)) {
                             column = a.getAnnotation(ColumnName.class).value();
                         }
-                        objectProperty.setColumnBytes(Bytes.toBytes(column));
+                        objectProperty.setColumnBytes(HbaseUtils.toBytes(column));
                         objectProperty.setColumn(column);
                         objectProperty.setType(a.getType());
                         return objectProperty;
