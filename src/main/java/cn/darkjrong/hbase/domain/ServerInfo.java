@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.domain;
+package cn.darkjrong.hbase.domain;
 
 import lombok.Data;
 

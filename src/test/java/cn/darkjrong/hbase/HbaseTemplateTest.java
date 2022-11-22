@@ -1,8 +1,8 @@
 package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.common.callback.RowMapper;
-import cn.darkjrong.hbase.common.domain.ServerInfo;
-import cn.darkjrong.hbase.common.domain.TableInfo;
+import cn.darkjrong.hbase.callback.RowMapper;
+import cn.darkjrong.hbase.domain.ServerInfo;
+import cn.darkjrong.hbase.domain.TableInfo;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseFactoryBean;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseProperties;
 import cn.hutool.core.util.ReflectUtil;

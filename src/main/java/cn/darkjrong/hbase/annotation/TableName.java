@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.annotation;
+package cn.darkjrong.hbase.annotation;
 
 import cn.darkjrong.hbase.HbaseConstant;
 import org.springframework.core.annotation.AliasFor;

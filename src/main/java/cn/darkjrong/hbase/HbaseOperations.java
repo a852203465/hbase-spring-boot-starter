@@ -1,9 +1,9 @@
 package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.common.callback.MutatorCallback;
-import cn.darkjrong.hbase.common.callback.TableCallback;
-import cn.darkjrong.hbase.common.callback.ResultsExtractor;
-import cn.darkjrong.hbase.common.callback.RowMapper;
+import cn.darkjrong.hbase.callback.MutatorCallback;
+import cn.darkjrong.hbase.callback.TableCallback;
+import cn.darkjrong.hbase.callback.ResultsExtractor;
+import cn.darkjrong.hbase.callback.RowMapper;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Scan;
 

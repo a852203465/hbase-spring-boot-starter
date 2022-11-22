@@ -1,6 +1,6 @@
 package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.common.annotation.TableName;
+import cn.darkjrong.hbase.annotation.TableName;
 import lombok.Data;
 
 @Data

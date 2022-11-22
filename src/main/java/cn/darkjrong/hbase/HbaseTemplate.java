@@ -1,12 +1,12 @@
 package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.common.callback.MutatorCallback;
-import cn.darkjrong.hbase.common.callback.TableCallback;
-import cn.darkjrong.hbase.common.domain.ServerInfo;
-import cn.darkjrong.hbase.common.domain.TableInfo;
-import cn.darkjrong.hbase.common.callback.ResultsExtractor;
-import cn.darkjrong.hbase.common.callback.RowMapper;
-import cn.darkjrong.hbase.common.callback.RowMapperResultsExtractor;
+import cn.darkjrong.hbase.callback.MutatorCallback;
+import cn.darkjrong.hbase.callback.TableCallback;
+import cn.darkjrong.hbase.domain.ServerInfo;
+import cn.darkjrong.hbase.domain.TableInfo;
+import cn.darkjrong.hbase.callback.ResultsExtractor;
+import cn.darkjrong.hbase.callback.RowMapper;
+import cn.darkjrong.hbase.callback.RowMapperResultsExtractor;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;

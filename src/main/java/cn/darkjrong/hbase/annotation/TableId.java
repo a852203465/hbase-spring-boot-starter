@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.annotation;
+package cn.darkjrong.hbase.annotation;
 
 
 import java.lang.annotation.*;

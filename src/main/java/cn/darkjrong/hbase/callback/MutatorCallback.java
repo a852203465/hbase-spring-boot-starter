@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.callback;
+package cn.darkjrong.hbase.callback;
 
 import org.apache.hadoop.hbase.client.BufferedMutator;
 

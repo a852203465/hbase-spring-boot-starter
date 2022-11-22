@@ -1,11 +1,11 @@
 package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.common.annotation.ColumnName;
-import cn.darkjrong.hbase.common.annotation.TableId;
-import cn.darkjrong.hbase.common.annotation.TableName;
+import cn.darkjrong.hbase.annotation.ColumnName;
+import cn.darkjrong.hbase.annotation.TableId;
+import cn.darkjrong.hbase.annotation.TableName;
 import cn.darkjrong.hbase.factory.ObjectMappedFactory;
-import cn.darkjrong.hbase.common.domain.ObjectMappedStatement;
-import cn.darkjrong.hbase.common.domain.ObjectProperty;
+import cn.darkjrong.hbase.domain.ObjectMappedStatement;
+import cn.darkjrong.hbase.domain.ObjectProperty;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ClassUtil;

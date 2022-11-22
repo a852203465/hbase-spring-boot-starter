@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.common.callback;
+package cn.darkjrong.hbase.callback;
 
 import cn.darkjrong.hbase.HbaseException;
 import cn.hutool.core.collection.CollectionUtil;

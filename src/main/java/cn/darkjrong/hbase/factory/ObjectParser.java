@@ -1,7 +1,7 @@
 package cn.darkjrong.hbase.factory;
 
-import cn.darkjrong.hbase.common.domain.ObjectMappedStatement;
-import cn.darkjrong.hbase.common.domain.ObjectProperty;
+import cn.darkjrong.hbase.domain.ObjectMappedStatement;
+import cn.darkjrong.hbase.domain.ObjectProperty;
 import cn.darkjrong.hbase.HbaseExceptionEnum;
 import cn.darkjrong.hbase.HbaseUtils;
 import cn.hutool.core.lang.Assert;
