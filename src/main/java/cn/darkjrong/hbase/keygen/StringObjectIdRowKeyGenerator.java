@@ -8,12 +8,12 @@ import cn.hutool.core.util.ReflectUtil;
 import java.lang.reflect.Field;
 
 /**
- * String类型主键赋值
+ * 字符串ObjectId键生成器
  *
  * @author Rong.Jia
  * @date 2022/11/22
  */
-public class StringUUIDKeyGenerator extends AbstractKeyGenerator {
+public class StringObjectIdRowKeyGenerator extends AbstractRowKeyGenerator {
 
     @Override
     public void postProcess(Field field, Object paramObj) {
@@ -22,14 +22,14 @@ public class StringUUIDKeyGenerator extends AbstractKeyGenerator {
             return;
         }
         if (!field.getType().isAssignableFrom(String.class)) {
-            throw new IllegalArgumentException("主键策略UUID==》对应主键属性类型必须为String");
+            throw new IllegalArgumentException("主键策略ObjectId==》对应主键属性类型必须为String");
         }
-        ReflectUtil.setFieldValue(paramObj, field, IdUtil.fastSimpleUUID());
+        ReflectUtil.setFieldValue(paramObj, field, IdUtil.objectId());
     }
 
     @Override
     public IdType getType() {
-        return IdType.ASSIGN_UUID;
+        return IdType.ASSIGN_OBJECT_ID;
     }
 
     @Override
@@ -37,11 +37,9 @@ public class StringUUIDKeyGenerator extends AbstractKeyGenerator {
         Field field = ReflectUtil.getField(paramObj.getClass(), HbaseConstant.ID);
         if (ReflectUtil.getFieldValue(paramObj, field) == null) {
             if (!field.getType().isAssignableFrom(String.class)) {
-                throw new IllegalArgumentException("主键策略UUID==》对应主键属性类型必须为String");
+                throw new IllegalArgumentException("主键策略ObjectId==》对应主键属性类型必须为String");
             }
-            ReflectUtil.setFieldValue(paramObj, field, IdUtil.fastSimpleUUID());
+            ReflectUtil.setFieldValue(paramObj, field, IdUtil.objectId());
         }
     }
-
-
 }

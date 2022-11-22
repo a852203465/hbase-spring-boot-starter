@@ -6,7 +6,7 @@ package cn.darkjrong.hbase.keygen;
  * @author Rong.Jia
  * @date 2022/11/22
  */
-public abstract class AbstractKeyGenerator implements RowKeyGenerator {
+public abstract class AbstractRowKeyGenerator implements RowKeyGenerator {
 
     /**
      * 默认id主键赋值

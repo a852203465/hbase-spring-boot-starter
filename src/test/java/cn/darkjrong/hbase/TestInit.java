@@ -2,10 +2,7 @@ package cn.darkjrong.hbase;
 
 import cn.darkjrong.hbase.enums.IdType;
 import cn.darkjrong.hbase.factory.RowKeyGeneratorFactory;
-import cn.darkjrong.hbase.keygen.InputKeyGenerator;
-import cn.darkjrong.hbase.keygen.RowKeyGenerator;
-import cn.darkjrong.hbase.keygen.SnowflakeIdKeyGenerator;
-import cn.darkjrong.hbase.keygen.StringUUIDKeyGenerator;
+import cn.darkjrong.hbase.keygen.*;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseFactoryBean;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseProperties;
 import cn.hutool.core.util.ReflectUtil;
@@ -39,9 +36,10 @@ public class TestInit extends ObjectMappedFactoryTest {
         hbaseTemplate = new HbaseTemplate(connection, hBaseAdmin);
 
         Map<IdType, RowKeyGenerator> idHandlerMap = new ConcurrentHashMap<>();
-        idHandlerMap.put(IdType.ASSIGN_ID, new SnowflakeIdKeyGenerator());
-        idHandlerMap.put(IdType.ASSIGN_UUID, new StringUUIDKeyGenerator());
-        idHandlerMap.put(IdType.INPUT, new InputKeyGenerator());
+        idHandlerMap.put(IdType.ASSIGN_ID, new SnowflakeIdRowKeyGenerator());
+        idHandlerMap.put(IdType.ASSIGN_UUID, new StringUUIDRowKeyGenerator());
+        idHandlerMap.put(IdType.INPUT, new InputRowKeyGenerator());
+        idHandlerMap.put(IdType.ASSIGN_OBJECT_ID, new StringObjectIdRowKeyGenerator());
 
         rowKeyGeneratorFactory = new RowKeyGeneratorFactory();
         ReflectUtil.setFieldValue(rowKeyGeneratorFactory, "idHandlerMap", idHandlerMap);

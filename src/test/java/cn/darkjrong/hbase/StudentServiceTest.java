@@ -41,7 +41,7 @@ public class StudentServiceTest extends TestInit {
     @Test
     void save() {
 
-        for (int i = 0; i <100; i++) {
+        for (int i = 0; i <10; i++) {
             Student student = new Student();
             student.setName("贾荣"+i);
             student.setEmail("852203465@qq.com"+i);

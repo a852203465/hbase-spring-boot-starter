@@ -1,9 +1,10 @@
 package cn.darkjrong.hbase;
 
 import cn.darkjrong.hbase.factory.RowKeyGeneratorFactory;
-import cn.darkjrong.hbase.keygen.InputKeyGenerator;
-import cn.darkjrong.hbase.keygen.SnowflakeIdKeyGenerator;
-import cn.darkjrong.hbase.keygen.StringUUIDKeyGenerator;
+import cn.darkjrong.hbase.keygen.InputRowKeyGenerator;
+import cn.darkjrong.hbase.keygen.SnowflakeIdRowKeyGenerator;
+import cn.darkjrong.hbase.keygen.StringObjectIdRowKeyGenerator;
+import cn.darkjrong.hbase.keygen.StringUUIDRowKeyGenerator;
 import lombok.AllArgsConstructor;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
@@ -46,18 +47,23 @@ public class HbaseConfig {
     }
 
     @Bean
-    public SnowflakeIdKeyGenerator snowflakeIdKeyGenerator() {
-        return new SnowflakeIdKeyGenerator();
+    public SnowflakeIdRowKeyGenerator snowflakeIdKeyGenerator() {
+        return new SnowflakeIdRowKeyGenerator();
     }
 
     @Bean
-    public InputKeyGenerator inputKeyGenerator() {
-        return new InputKeyGenerator();
+    public InputRowKeyGenerator inputKeyGenerator() {
+        return new InputRowKeyGenerator();
     }
 
     @Bean
-    public StringUUIDKeyGenerator stringUUIDKeyGenerator() {
-        return new StringUUIDKeyGenerator();
+    public StringUUIDRowKeyGenerator stringUUIDKeyGenerator() {
+        return new StringUUIDRowKeyGenerator();
+    }
+
+    @Bean
+    public StringObjectIdRowKeyGenerator stringObjectIdRowKeyGenerator() {
+        return new StringObjectIdRowKeyGenerator();
     }
 
 

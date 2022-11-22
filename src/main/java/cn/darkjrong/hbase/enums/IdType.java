@@ -28,7 +28,10 @@ public enum IdType {
 	 */
 	ASSIGN_UUID,
 
-
+	/**
+	 * 分配ObjectId
+	 */
+	ASSIGN_OBJECT_ID
 
 
 

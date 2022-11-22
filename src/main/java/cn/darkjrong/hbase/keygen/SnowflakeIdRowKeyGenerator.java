@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
  * @author Rong.Jia
  * @date 2022/11/22
  */
-public class SnowflakeIdKeyGenerator extends AbstractKeyGenerator {
+public class SnowflakeIdRowKeyGenerator extends AbstractRowKeyGenerator {
 
     @Override
     public void postProcess(Field field, Object paramObj) {

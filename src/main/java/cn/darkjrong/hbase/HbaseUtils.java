@@ -135,7 +135,6 @@ public class HbaseUtils {
         T instance = ReflectUtil.newInstance(clazz);
         Map<String, ObjectProperty> properties = statement.getColumns();
         for(Cell cell : result.rawCells()) {
-            System.out.println(cell.toString());
             String qualifier = Bytes.toString(cell.getQualifierArray(),cell.getQualifierOffset(),cell.getQualifierLength());
             Object value = HbaseUtils.getValue(properties.get(qualifier).getType(), cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
             ReflectUtil.setFieldValue(instance, qualifier, value);

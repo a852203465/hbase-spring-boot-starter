@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
  * @author Rong.Jia
  * @date 2022/11/22
  */
-public class InputKeyGenerator extends AbstractKeyGenerator {
+public class InputRowKeyGenerator extends AbstractRowKeyGenerator {
 
     @Override
     public void postProcess(Field field, Object paramObj) {

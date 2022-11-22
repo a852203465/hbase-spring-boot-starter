@@ -9,13 +9,13 @@ import cn.darkjrong.hbase.factory.RowKeyGeneratorFactory;
 import cn.darkjrong.hbase.service.HbaseService;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.TypeUtil;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +28,6 @@ import java.util.List;
 public class HbaseServiceImpl<T, ID> implements HbaseService<T, ID> {
 
     protected Class<T> targetClass = this.currentTargetClass();
-    protected Class<ID> keyClass = this.currentKeyType();
 
     @Autowired
     protected HbaseTemplate hbaseTemplate;
@@ -40,13 +39,7 @@ public class HbaseServiceImpl<T, ID> implements HbaseService<T, ID> {
     private RowKeyGeneratorFactory rowKeyGeneratorFactory;
 
     protected Class<T> currentTargetClass() {
-        ParameterizedType parameterizedType = (ParameterizedType) this.getClass().getGenericSuperclass();
-        return (Class<T>) parameterizedType.getActualTypeArguments()[0];
-    }
-
-    protected Class<ID> currentKeyType() {
-        ParameterizedType parameterizedType = (ParameterizedType) this.getClass().getGenericSuperclass();
-        return (Class<ID>) parameterizedType.getActualTypeArguments()[1];
+        return (Class<T>) TypeUtil.getTypeArgument(this.getClass());
     }
 
     protected ObjectMappedStatement currentStatement() {
