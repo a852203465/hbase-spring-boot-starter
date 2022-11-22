@@ -43,10 +43,10 @@ public class StudentServiceTest extends TestInit {
     void save() {
 
         Student student = new Student();
-        student.setName("贾荣"+101010);
-        student.setEmail("852203465@qq.com"+110010);
-        student.setAge(12+110100);
-        student.setSex("男"+101001);
+        student.setName("贾荣"+10221010);
+        student.setEmail("852203465@qq.com"+11001011);
+        student.setAge(12+1101100);
+        student.setSex("男"+1011001);
 
         System.out.println(studentService.save(student));
     }
@@ -61,7 +61,7 @@ public class StudentServiceTest extends TestInit {
     @Test
     void findById() {
 
-        Optional<Student> optional = studentService.findById(1595066431291060224L);
+        Optional<Student> optional = studentService.findById(1595071631561142272L);
         System.out.println(optional.get());
 
     }

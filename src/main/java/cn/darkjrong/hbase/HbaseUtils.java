@@ -179,7 +179,7 @@ public class HbaseUtils {
         if (Number.class.isAssignableFrom(clazz)) {
             return ByteUtil.numberToBytes((Number) key);
         } else if (String.class.isAssignableFrom(clazz)){
-            return StrUtil.bytes((String) key);
+            return Convert.toPrimitiveByteArray((String) key);
         }else {
             return Convert.toPrimitiveByteArray(key);
         }
@@ -191,7 +191,7 @@ public class HbaseUtils {
      * @return {@link byte[]}
      */
     public static byte[] toBytes(String value) {
-       return StrUtil.bytes(value);
+       return Convert.toPrimitiveByteArray(value);
     }
 
     /**
