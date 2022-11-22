@@ -16,5 +16,10 @@ public class HbaseConstant {
     public static final String NAME = "name";
     public static final String COLUMN_FAMILY = "columnFamily";
 
+    public static final String ID_TYPE = "spring.data.hbase.id-type";
+    public static final String ID_TYPE_TWO = "spring.data.hbase.idIype";
+
+
+
 
 }

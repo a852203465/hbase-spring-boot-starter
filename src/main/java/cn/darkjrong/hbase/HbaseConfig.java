@@ -1,5 +1,9 @@
 package cn.darkjrong.hbase;
 
+import cn.darkjrong.hbase.factory.RowKeyGeneratorFactory;
+import cn.darkjrong.hbase.keygen.InputKeyGenerator;
+import cn.darkjrong.hbase.keygen.SnowflakeIdKeyGenerator;
+import cn.darkjrong.hbase.keygen.StringUUIDKeyGenerator;
 import lombok.AllArgsConstructor;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
@@ -36,7 +40,25 @@ public class HbaseConfig {
         return new HbaseTemplate(connection, admin);
     }
 
+    @Bean
+    public RowKeyGeneratorFactory keyGeneratorFactory() {
+        return new RowKeyGeneratorFactory();
+    }
 
+    @Bean
+    public SnowflakeIdKeyGenerator snowflakeIdKeyGenerator() {
+        return new SnowflakeIdKeyGenerator();
+    }
+
+    @Bean
+    public InputKeyGenerator inputKeyGenerator() {
+        return new InputKeyGenerator();
+    }
+
+    @Bean
+    public StringUUIDKeyGenerator stringUUIDKeyGenerator() {
+        return new StringUUIDKeyGenerator();
+    }
 
 
 

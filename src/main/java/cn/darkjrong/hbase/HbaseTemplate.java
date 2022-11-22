@@ -1,12 +1,9 @@
 package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.callback.MutatorCallback;
-import cn.darkjrong.hbase.callback.TableCallback;
-import cn.darkjrong.hbase.callback.ResultsExtractor;
-import cn.darkjrong.hbase.callback.RowMapper;
-import cn.darkjrong.hbase.callback.RowMapperResultsExtractor;
+import cn.darkjrong.hbase.callback.*;
 import cn.darkjrong.hbase.domain.ServerInfo;
 import cn.darkjrong.hbase.domain.TableInfo;
+import cn.darkjrong.hbase.enums.HbaseExceptionEnum;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
@@ -1641,8 +1638,10 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notNull(action, "Callback object must not be null");
         Assert.notNull(tableName, "No table specified");
 
-        Table table = getTable(tableName);
+        StopWatch sw = new StopWatch();
+        sw.start();
 
+        Table table = getTable(tableName);
         try {
             return action.doInTable(table);
         } catch (Throwable throwable) {

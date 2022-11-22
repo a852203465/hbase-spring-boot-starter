@@ -1,6 +1,8 @@
 package cn.darkjrong.hbase.annotation;
 
 
+import cn.darkjrong.hbase.enums.IdType;
+
 import java.lang.annotation.*;
 
 /**
@@ -14,5 +16,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface TableId {
 
+    IdType value() default IdType.ASSIGN_ID;
 
 }

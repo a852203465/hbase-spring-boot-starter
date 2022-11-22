@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase;
+package cn.darkjrong.hbase.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

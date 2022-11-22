@@ -5,6 +5,8 @@ import cn.darkjrong.hbase.annotation.TableId;
 import cn.darkjrong.hbase.annotation.TableName;
 import cn.darkjrong.hbase.domain.ObjectMappedStatement;
 import cn.darkjrong.hbase.domain.ObjectProperty;
+import cn.darkjrong.hbase.enums.HbaseExceptionEnum;
+import cn.darkjrong.hbase.enums.IdType;
 import cn.darkjrong.hbase.factory.ObjectMappedFactory;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
@@ -42,12 +44,16 @@ public class ObjectMappedFactoryTest {
             objectMappedStatement.setColumnFamily(clazz.getAnnotation(TableName.class).columnFamily());
             objectMappedStatement.setColumnFamilyBytes(Bytes.toBytes(objectMappedStatement.getColumnFamily()));
             Map<String, ObjectProperty> properties = parseProperties(clazz);
-            ObjectProperty objectProperty = properties.values().stream().filter(a -> a.getField().isAnnotationPresent(TableId.class)).findAny().orElse(null);
+            ObjectProperty objectProperty = properties.values().stream()
+                    .filter(a -> a.getField().isAnnotationPresent(TableId.class)).findAny().orElse(null);
             if (ObjectUtil.isEmpty(objectProperty)) {
                 objectProperty = properties.get(HbaseConstant.ID);
             }
             Assert.notNull(objectProperty, HbaseExceptionEnum.getException(HbaseExceptionEnum.ID_NOT_FOUND, className));
             objectMappedStatement.setColumns(properties);
+            TableId annotation = objectProperty.getField().getAnnotation(TableId.class);
+            IdType idType = ObjectUtil.isEmpty(annotation) ? IdType.ASSIGN_ID : annotation.value();
+            objectMappedStatement.setIdType(idType);
             objectMappedStatement.setTableId(objectProperty.getField());
             objectMappedFactory.addStatement(className, objectMappedStatement);
         }

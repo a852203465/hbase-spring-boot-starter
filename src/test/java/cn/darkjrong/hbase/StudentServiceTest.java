@@ -1,6 +1,5 @@
 package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.repository.SimpleHbaseRepository;
 import cn.darkjrong.hbase.service.StudentService;
 import cn.darkjrong.hbase.service.impl.StudentServiceImpl;
 import cn.hutool.core.util.ReflectUtil;
@@ -17,9 +16,9 @@ public class StudentServiceTest extends TestInit {
     @BeforeEach
     public void before() {
         studentService = new StudentServiceImpl();
-        SimpleHbaseRepository<Student, Integer> simpleHbaseRepository
-                = new SimpleHbaseRepository<Student, Integer>(hbaseTemplate, objectMappedFactory);
-        ReflectUtil.setFieldValue(studentService, "hbaseRepository", simpleHbaseRepository);
+        ReflectUtil.setFieldValue(studentService, "hbaseTemplate", hbaseTemplate);
+        ReflectUtil.setFieldValue(studentService, "objectMappedFactory", objectMappedFactory);
+        ReflectUtil.setFieldValue(studentService, "rowKeyGeneratorFactory", rowKeyGeneratorFactory);
     }
 
     @Test
@@ -42,15 +41,15 @@ public class StudentServiceTest extends TestInit {
     @Test
     void save() {
 
-        Student student = new Student();
-        student.setId(2);
-        student.setName("贾荣2");
-        student.setEmail("852203465@qq.com2");
-        student.setAge(228);
-        student.setSex("男2");
+        for (int i = 0; i <100; i++) {
+            Student student = new Student();
+            student.setName("贾荣"+i);
+            student.setEmail("852203465@qq.com"+i);
+            student.setAge(12+i);
+            student.setSex("男"+i);
 
-        studentService.save(student);
-
+            studentService.save(student);
+        }
     }
 
     @Test

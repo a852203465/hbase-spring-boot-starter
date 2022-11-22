@@ -1,13 +1,14 @@
 package cn.darkjrong.hbase.factory;
 
+import cn.darkjrong.hbase.HbaseConstant;
 import cn.darkjrong.hbase.annotation.ColumnName;
 import cn.darkjrong.hbase.annotation.MappedScan;
 import cn.darkjrong.hbase.annotation.TableId;
 import cn.darkjrong.hbase.annotation.TableName;
-import cn.darkjrong.hbase.HbaseConstant;
-import cn.darkjrong.hbase.HbaseExceptionEnum;
 import cn.darkjrong.hbase.domain.ObjectMappedStatement;
 import cn.darkjrong.hbase.domain.ObjectProperty;
+import cn.darkjrong.hbase.enums.HbaseExceptionEnum;
+import cn.darkjrong.hbase.enums.IdType;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ClassUtil;
@@ -107,14 +108,23 @@ public class ObjectMappedRegistrar implements ImportBeanDefinitionRegistrar, Res
         objectMappedStatement.setColumnFamily(columnFamily);
         objectMappedStatement.setColumnFamilyBytes(Bytes.toBytes(columnFamily));
         Map<String, ObjectProperty> properties = parseProperties(className);
-        ObjectProperty objectProperty = properties.values().stream().filter(a -> a.getField().isAnnotationPresent(TableId.class)).findAny().orElse(null);
+        ObjectProperty objectProperty = properties.values().stream()
+                .filter(a -> a.getField().isAnnotationPresent(TableId.class))
+                .findAny().orElse(null);
         if (ObjectUtil.isEmpty(objectProperty)) {
             objectProperty = properties.get(HbaseConstant.ID);
         }
         Assert.notNull(objectProperty, HbaseExceptionEnum.getException(HbaseExceptionEnum.ID_NOT_FOUND, className));
+
+        TableId annotation = objectProperty.getField().getAnnotation(TableId.class);
+        String property = environment.getProperty(HbaseConstant.ID_TYPE);
+        if(StrUtil.isBlank(property)) property = environment.getProperty(HbaseConstant.ID_TYPE_TWO);
+        IdType idType = ObjectUtil.isEmpty(annotation)
+                ? ObjectUtil.isEmpty(property) ? IdType.ASSIGN_ID : IdType.valueOf(property.toUpperCase())
+                : annotation.value();
+        objectMappedStatement.setIdType(idType);
         objectMappedStatement.setColumns(properties);
         objectMappedStatement.setTableId(objectProperty.getField());
-        objectMappedStatement.setRowKey(Bytes.toBytes(properties.size()));
         getFactory().addStatement(className, objectMappedStatement);
     }
 

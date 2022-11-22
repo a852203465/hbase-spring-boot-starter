@@ -1,5 +1,6 @@
 package cn.darkjrong.hbase.domain;
 
+import cn.darkjrong.hbase.enums.IdType;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -28,6 +29,11 @@ public class ObjectMappedStatement implements Serializable {
     private Field tableId;
 
     /**
+     * ID生成类型
+     */
+    private IdType idType;
+
+    /**
      * 表名
      */
     private String tableName;
@@ -46,11 +52,6 @@ public class ObjectMappedStatement implements Serializable {
      * 列族名节数组
      */
     private byte[] columnFamilyBytes;
-
-    /**
-     * 行数
-     */
-    private byte[] rowKey;
 
     /**
      * 属性集合, key: 字段名, value: 字段属性

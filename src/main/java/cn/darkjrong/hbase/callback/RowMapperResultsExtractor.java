@@ -24,10 +24,10 @@ public class RowMapperResultsExtractor<T> implements ResultsExtractor<List<T>> {
     }
 
     @Override
-    public List<T> extractData(ResultScanner results) throws HbaseException {
+    public List<T> extractData(ResultScanner scanner) throws HbaseException {
         List<T> rs = CollectionUtil.newArrayList();
         int rowNum = 0;
-        for (Result result : results) {
+        for (Result result : scanner) {
             rs.add(rowMapper.mapRow(result, rowNum++));
         }
         return rs;

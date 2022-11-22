@@ -7,7 +7,7 @@ import lombok.Data;
 @TableName("student")
 public class Student {
 
-    private Integer id;
+    private Long id;
     private String name;
     private String email;
     private Integer age;

@@ -1,14 +1,22 @@
 package cn.darkjrong.hbase;
 
+import cn.darkjrong.hbase.domain.ObjectMappedStatement;
+import cn.darkjrong.hbase.domain.ObjectProperty;
+import cn.darkjrong.hbase.enums.HbaseExceptionEnum;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.ReflectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.BufferedMutator;
+import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * hbase 工具类
@@ -114,6 +122,26 @@ public class HbaseUtils {
         }
     }
 
+    /**
+     * 对象解析
+     *
+     * @param clazz     clazz
+     * @param result    结果
+     * @param statement 声明
+     * @return {@link T}
+     */
+    public static <T> T objectParse(Class<T> clazz, Result result, ObjectMappedStatement statement) {
+        Assert.notNull(statement, HbaseExceptionEnum.getException(HbaseExceptionEnum.MAPPED, clazz.getName()));
+        T instance = ReflectUtil.newInstance(clazz);
+        Map<String, ObjectProperty> properties = statement.getColumns();
+        for(Cell cell : result.rawCells()) {
+            System.out.println(cell.toString());
+            String qualifier = Bytes.toString(cell.getQualifierArray(),cell.getQualifierOffset(),cell.getQualifierLength());
+            Object value = HbaseUtils.getValue(properties.get(qualifier).getType(), cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
+            ReflectUtil.setFieldValue(instance, qualifier, value);
+        }
+        return instance;
+    }
 
 
 

@@ -1,7 +1,14 @@
 package cn.darkjrong.hbase;
 
+import cn.darkjrong.hbase.enums.IdType;
+import cn.darkjrong.hbase.factory.RowKeyGeneratorFactory;
+import cn.darkjrong.hbase.keygen.InputKeyGenerator;
+import cn.darkjrong.hbase.keygen.RowKeyGenerator;
+import cn.darkjrong.hbase.keygen.SnowflakeIdKeyGenerator;
+import cn.darkjrong.hbase.keygen.StringUUIDKeyGenerator;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseFactoryBean;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseProperties;
+import cn.hutool.core.util.ReflectUtil;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
@@ -9,10 +16,13 @@ import org.apache.hadoop.hbase.client.HBaseAdmin;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TestInit extends ObjectMappedFactoryTest {
 
     protected HbaseTemplate hbaseTemplate;
+    protected RowKeyGeneratorFactory rowKeyGeneratorFactory;
 
     @BeforeEach
    public void testInit() throws IOException {
@@ -27,7 +37,29 @@ public class TestInit extends ObjectMappedFactoryTest {
         Connection connection = ConnectionFactory.createConnection(configuration);
         HBaseAdmin hBaseAdmin = (HBaseAdmin) connection.getAdmin();
         hbaseTemplate = new HbaseTemplate(connection, hBaseAdmin);
+
+        Map<IdType, RowKeyGenerator> idHandlerMap = new ConcurrentHashMap<>();
+        idHandlerMap.put(IdType.ASSIGN_ID, new SnowflakeIdKeyGenerator());
+        idHandlerMap.put(IdType.ASSIGN_UUID, new StringUUIDKeyGenerator());
+        idHandlerMap.put(IdType.INPUT, new InputKeyGenerator());
+
+        rowKeyGeneratorFactory = new RowKeyGeneratorFactory();
+        ReflectUtil.setFieldValue(rowKeyGeneratorFactory, "idHandlerMap", idHandlerMap);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
