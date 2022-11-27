@@ -129,6 +129,16 @@ public interface HbaseOperations {
     /**
      * 获取行
      *
+     * @param tableName 表名
+     * @param rowKey   行Key
+     * @param rowMapper 行映射器
+     * @return {@link T}
+     */
+    <T, ID extends Serializable> T get(String tableName, ID rowKey, RowMapper<T> rowMapper);
+
+    /**
+     * 获取行
+     *
      * @param tableName    表名
      * @param rowKey      行Key
      * @param rowMapper       行映射器
@@ -159,6 +169,18 @@ public interface HbaseOperations {
      * @return {@link T}
      */
     <T> T get(String tableName, String rowKey, String columnFamily, String qualifier, RowMapper<T> rowMapper);
+
+    /**
+     * 获取行
+     *
+     * @param tableName    表名
+     * @param rowKey      行Key
+     * @param rowMapper    行映射器
+     * @param columnFamily 列族
+     * @param qualifier    字段名
+     * @return {@link T}
+     */
+    <T, ID extends Serializable> T get(String tableName, ID rowKey, String columnFamily, String qualifier, RowMapper<T> rowMapper);
 
     /**
      * 插入单个数据

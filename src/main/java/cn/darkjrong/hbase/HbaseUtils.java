@@ -3,16 +3,14 @@ package cn.darkjrong.hbase;
 import cn.darkjrong.hbase.domain.ObjectMappedStatement;
 import cn.darkjrong.hbase.domain.ObjectProperty;
 import cn.darkjrong.hbase.enums.HbaseExceptionEnum;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.*;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.client.BufferedMutator;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Table;
-import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -81,11 +79,11 @@ public class HbaseUtils {
         Assert.notNull(statement, HbaseExceptionEnum.getException(HbaseExceptionEnum.MAPPED, clazz.getName()));
         if (ArrayUtil.isNotEmpty(result.rawCells())) {
             T instance = ReflectUtil.newInstance(clazz);
-            Map<String, ObjectProperty> properties = statement.getColumns();
-            for(Cell cell : result.rawCells()) {
-                String qualifier = Bytes.toString(cell.getQualifierArray(),cell.getQualifierOffset(),cell.getQualifierLength());
-                Object value = HbaseUtils.getValue(properties.get(qualifier).getType(), cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
-                ReflectUtil.setFieldValue(instance, qualifier, value);
+            Map<String, ObjectProperty> columns = statement.getColumns();
+
+            for (Map.Entry<String, ObjectProperty> entry : columns.entrySet()) {
+                Object value = getValue(entry.getValue().getType(), result.getValue(statement.getColumnFamilyBytes(), toBytes(entry.getKey())));
+                ReflectUtil.setFieldValue(instance, entry.getKey(), value);
             }
             return instance;
         }
@@ -101,7 +99,7 @@ public class HbaseUtils {
         if (serializable instanceof Number) {
             return ByteUtil.numberToBytes((Number) serializable);
         } else {
-            return StrUtil.bytes((String) serializable);
+            return StrUtil.bytes((String) serializable, CharsetUtil.UTF_8);
         }
     }
 
@@ -114,21 +112,21 @@ public class HbaseUtils {
         if (tClass.equals(String.class)) {
             return toBytes((String) value);
         }else if (tClass.equals(Integer.class)) {
-            return Bytes.toBytes((Integer) value);
+            return ByteUtil.intToBytes((Integer) value);
         }else if (tClass.equals(Long.class)) {
-            return Bytes.toBytes((Long) value);
+            return ByteUtil.longToBytes((Long) value);
         }else if (tClass.equals(Double.class)) {
-            return Bytes.toBytes((Double) value);
+            return ByteUtil.doubleToBytes((Double) value);
         }else if (tClass.equals(Float.class)) {
-            return Bytes.toBytes((Float) value);
+            return ByteUtil.floatToBytes((Float) value);
         }else if (tClass.equals(BigDecimal.class)) {
-            return Bytes.toBytes((BigDecimal)value);
+            return ByteUtil.numberToBytes((BigDecimal)value);
         }else if (tClass.equals(Boolean.class)) {
-            return Bytes.toBytes((Boolean) value);
+            return new byte[]{(byte)((Boolean)value ? -1 : 0)};
         }else if (tClass.equals(Short.class)) {
-            return Bytes.toBytes((Short) value);
+            return ByteUtil.shortToBytes((Short) value);
         }else {
-            return Convert.toPrimitiveByteArray(value);
+            return JSON.toJSONBytes(value);
         }
     }
 
@@ -138,50 +136,42 @@ public class HbaseUtils {
      * @return {@link byte[]}
      */
     public static String toStr(byte[] bytes) {
-        return Bytes.toString(bytes);
+        return StrUtil.str(bytes, CharsetUtil.UTF_8);
     }
 
     /**
      * 获取值
      *
      * @param tClass t类
-     * @param data   数据
+     * @param value   数据
      * @return {@link Object}
      */
-    public static <T> T getValue(Class<T> tClass, byte[] data) {
-        return Convert.convert(tClass, data);
-    }
-
-    /**
-     * 获取值
-     *
-     * @param tClass t类
-     * @param data   数据
-     * @param offset 偏移量
-     * @param length 长度
-     * @return {@link Object}
-     */
-    public static Object getValue(Class<?> tClass, byte[] data, int offset, int length) {
+    public static Object getValue(Class<?> tClass, byte[] value) {
         if (tClass.equals(String.class)) {
-            return Bytes.toString(data, offset, length);
-        }else if (tClass.equals(int.class) || tClass.equals(Integer.class)) {
-            return Bytes.toInt(data);
-        }else if (tClass.equals(Long.class) || tClass.equals(long.class)) {
-            return Bytes.toLong(data);
-        }else if (tClass.equals(double.class) || tClass.equals(Double.class)) {
-            return Bytes.toDouble(data);
-        }else if (tClass.equals(float.class) || tClass.equals(Float.class)) {
-            return Bytes.toFloat(data);
+            return toStr(value);
+        }else if (tClass.equals(Integer.class)) {
+            return ByteUtil.bytesToInt(value);
+        }else if (tClass.equals(Long.class)) {
+            return ByteUtil.bytesToLong(value);
+        }else if (tClass.equals(Double.class)) {
+            return ByteUtil.bytesToDouble(value);
+        }else if (tClass.equals(Float.class)) {
+            return ByteUtil.bytesToFloat(value);
         }else if (tClass.equals(BigDecimal.class)) {
-            return Bytes.toBigDecimal(data, offset, length);
-        }else if (tClass.equals(Boolean.class) || tClass.equals(boolean.class)) {
-            return Bytes.toBoolean(data);
-        }else if (tClass.equals(Short.class) || tClass.equals(short.class)) {
-            return Bytes.toShort(data);
+            return ByteUtil.bytesToNumber(value, BigDecimal.class, ByteUtil.DEFAULT_ORDER);
+        }else if (tClass.equals(Boolean.class)) {
+            if (value.length != 1) {
+                throw new IllegalArgumentException("Array has wrong size: " + value.length);
+            } else {
+                return value[0] != 0;
+            }
+        }else if (tClass.equals(Short.class)) {
+            return ByteUtil.bytesToShort(value);
         }else {
-            return Bytes.toString(data, offset, length);
+            return JSON.parseObject(value, tClass);
         }
     }
+
 
 
 

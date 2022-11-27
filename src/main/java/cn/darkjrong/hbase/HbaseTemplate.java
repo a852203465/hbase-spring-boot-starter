@@ -1722,6 +1722,11 @@ public class HbaseTemplate implements HbaseOperations {
     }
 
     @Override
+    public <T, ID extends Serializable> T get(String tableName, ID rowKey, RowMapper<T> rowMapper) {
+        return get(tableName, rowKey, null, rowMapper);
+    }
+
+    @Override
     public <T> T get(String tableName, String rowKey, String columnFamily, RowMapper<T> action) {
         return get(tableName, rowKey, columnFamily, null, action);
     }
@@ -1749,6 +1754,11 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public <T> T get(String tableName, String rowKey, String columnFamily, String qualifier, RowMapper<T> action) {
+        return get(tableName, (Serializable) rowKey, columnFamily, qualifier, action);
+    }
+
+    @Override
+    public <T, ID extends Serializable> T get(String tableName, ID rowKey, String columnFamily, String qualifier, RowMapper<T> rowMapper) {
         return execute(tableName, new TableCallback<T>() {
             @Override
             public T doInTable(Table table) {
@@ -1763,7 +1773,7 @@ public class HbaseTemplate implements HbaseOperations {
                 }
                 try {
                     Result result = table.get(get);
-                    return action.mapRow(result, 0);
+                    return rowMapper.mapRow(result, 0);
                 } catch (IOException e) {
                     log.error("get", e);
                     throw new HbaseException(e);
