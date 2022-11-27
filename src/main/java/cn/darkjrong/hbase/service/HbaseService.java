@@ -66,11 +66,6 @@ public interface HbaseService<T, ID extends Serializable> {
      * @return {@link Boolean}
      */
     Boolean deleteAllById(Set<ID> ids);
-//
-//    void deleteAll(Iterable<? extends T> entities);
-//
-//    void deleteAll();
-
 
 
 }
