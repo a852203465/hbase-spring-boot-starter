@@ -4,6 +4,7 @@ import cn.darkjrong.hbase.service.StudentService;
 import cn.darkjrong.hbase.service.impl.StudentServiceImpl;
 import cn.hutool.core.util.ReflectUtil;
 import com.alibaba.fastjson.JSON;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -61,12 +62,18 @@ public class StudentServiceTest extends TestInit {
     @Test
     void findById() {
 
-        Optional<Student> optional = studentService.findById(1595071631561142272L);
+        Optional<Student> optional = studentService.findById(1595030848606953472L);
         System.out.println(optional.get());
 
     }
 
+    public static void main(String[] args) {
 
+        byte[] bytes = Bytes.toBytes(1595401874058526720L);
+        System.out.println();
+
+
+    }
 
 
 

@@ -70,66 +70,6 @@ public class HbaseUtils {
     }
 
     /**
-     * 获取值
-     *
-     * @param tClass t类
-     * @param data   数据
-     * @return {@link Object}
-     */
-    public static Object getValue(Class<?> tClass, byte[] data) {
-        if (tClass.equals(String.class)) {
-            return toStr(data);
-        }else if (tClass.equals(int.class) || tClass.equals(Integer.class)) {
-            return Convert.toInt(data);
-        }else if (tClass.equals(Long.class) || tClass.equals(long.class)) {
-            return Convert.toLong(data);
-        }else if (tClass.equals(double.class) || tClass.equals(Double.class)) {
-            return Convert.toDouble(data);
-        }else if (tClass.equals(float.class) || tClass.equals(Float.class)) {
-            return Convert.toFloat(data);
-        }else if (tClass.equals(BigDecimal.class)) {
-            return Convert.toBigDecimal(data);
-        }else if (tClass.equals(Boolean.class) || tClass.equals(boolean.class)) {
-            return Convert.toBool(data);
-        }else if (tClass.equals(Short.class) || tClass.equals(short.class)) {
-            return Convert.toShort(data);
-        }else {
-            return toStr(data);
-        }
-    }
-
-    /**
-     * 获取值
-     *
-     * @param tClass t类
-     * @param data   数据
-     * @param offset 偏移量
-     * @param length 长度
-     * @return {@link Object}
-     */
-    public static Object getValue(Class<?> tClass, byte[] data, int offset, int length) {
-        if (tClass.equals(String.class)) {
-            return Bytes.toString(data, offset, length);
-        }else if (tClass.equals(int.class) || tClass.equals(Integer.class)) {
-            return Convert.toInt(data);
-        }else if (tClass.equals(Long.class) || tClass.equals(long.class)) {
-            return Convert.toLong(data);
-        }else if (tClass.equals(double.class) || tClass.equals(Double.class)) {
-            return Convert.toDouble(data);
-        }else if (tClass.equals(float.class) || tClass.equals(Float.class)) {
-            return Convert.toFloat(data);
-        }else if (tClass.equals(BigDecimal.class)) {
-            return Bytes.toBigDecimal(data, offset, length);
-        }else if (tClass.equals(Boolean.class) || tClass.equals(boolean.class)) {
-            return Convert.toBool(data);
-        }else if (tClass.equals(Short.class) || tClass.equals(short.class)) {
-            return Convert.toShort(data);
-        }else {
-            return Bytes.toString(data, offset, length);
-        }
-    }
-
-    /**
      * 对象解析
      *
      * @param clazz     clazz
@@ -142,11 +82,6 @@ public class HbaseUtils {
         if (ArrayUtil.isNotEmpty(result.rawCells())) {
             T instance = ReflectUtil.newInstance(clazz);
             Map<String, ObjectProperty> properties = statement.getColumns();
-
-            for (Map.Entry<String, ObjectProperty> entry : properties.entrySet()) {
-                System.out.println(toStr(result.getValue(statement.getColumnFamilyBytes(), toBytes(entry.getKey()))));
-            }
-
             for(Cell cell : result.rawCells()) {
                 String qualifier = Bytes.toString(cell.getQualifierArray(),cell.getQualifierOffset(),cell.getQualifierLength());
                 Object value = HbaseUtils.getValue(properties.get(qualifier).getType(), cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
@@ -172,26 +107,29 @@ public class HbaseUtils {
 
     /**
      *将{@link Object}转换为 {@link byte[]}
-     * @param clazz {@link Class<?>}  key的类型
      * @return {@link byte[]}
      */
-    public static byte[] toBytes(Class<?> clazz, Object key) {
-        if (Number.class.isAssignableFrom(clazz)) {
-            return ByteUtil.numberToBytes((Number) key);
-        } else if (String.class.isAssignableFrom(clazz)){
-            return Convert.toPrimitiveByteArray((String) key);
+    public static byte[] toBytes(Object value) {
+        Class<?> tClass = value.getClass();
+        if (tClass.equals(String.class)) {
+            return toBytes((String) value);
+        }else if (tClass.equals(Integer.class)) {
+            return Bytes.toBytes((Integer) value);
+        }else if (tClass.equals(Long.class)) {
+            return Bytes.toBytes((Long) value);
+        }else if (tClass.equals(Double.class)) {
+            return Bytes.toBytes((Double) value);
+        }else if (tClass.equals(Float.class)) {
+            return Bytes.toBytes((Float) value);
+        }else if (tClass.equals(BigDecimal.class)) {
+            return Bytes.toBytes((BigDecimal)value);
+        }else if (tClass.equals(Boolean.class)) {
+            return Bytes.toBytes((Boolean) value);
+        }else if (tClass.equals(Short.class)) {
+            return Bytes.toBytes((Short) value);
         }else {
-            return Convert.toPrimitiveByteArray(key);
+            return Convert.toPrimitiveByteArray(value);
         }
-    }
-
-    /**
-     *将{@link String}转换为 {@link byte[]}
-     * @param value {@link String}
-     * @return {@link byte[]}
-     */
-    public static byte[] toBytes(String value) {
-       return Convert.toPrimitiveByteArray(value);
     }
 
     /**
@@ -200,10 +138,50 @@ public class HbaseUtils {
      * @return {@link byte[]}
      */
     public static String toStr(byte[] bytes) {
-        return new String(bytes);
+        return Bytes.toString(bytes);
     }
 
+    /**
+     * 获取值
+     *
+     * @param tClass t类
+     * @param data   数据
+     * @return {@link Object}
+     */
+    public static <T> T getValue(Class<T> tClass, byte[] data) {
+        return Convert.convert(tClass, data);
+    }
 
+    /**
+     * 获取值
+     *
+     * @param tClass t类
+     * @param data   数据
+     * @param offset 偏移量
+     * @param length 长度
+     * @return {@link Object}
+     */
+    public static Object getValue(Class<?> tClass, byte[] data, int offset, int length) {
+        if (tClass.equals(String.class)) {
+            return Bytes.toString(data, offset, length);
+        }else if (tClass.equals(int.class) || tClass.equals(Integer.class)) {
+            return Bytes.toInt(data);
+        }else if (tClass.equals(Long.class) || tClass.equals(long.class)) {
+            return Bytes.toLong(data);
+        }else if (tClass.equals(double.class) || tClass.equals(Double.class)) {
+            return Bytes.toDouble(data);
+        }else if (tClass.equals(float.class) || tClass.equals(Float.class)) {
+            return Bytes.toFloat(data);
+        }else if (tClass.equals(BigDecimal.class)) {
+            return Bytes.toBigDecimal(data, offset, length);
+        }else if (tClass.equals(Boolean.class) || tClass.equals(boolean.class)) {
+            return Bytes.toBoolean(data);
+        }else if (tClass.equals(Short.class) || tClass.equals(short.class)) {
+            return Bytes.toShort(data);
+        }else {
+            return Bytes.toString(data, offset, length);
+        }
+    }
 
 
 

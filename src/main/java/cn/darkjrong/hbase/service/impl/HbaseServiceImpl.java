@@ -60,12 +60,12 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
         List<Mutation> mutations = new ArrayList<>();
         rowKeyGeneratorFactory.doHandler(mappedStatement.getIdType(), entity, mappedStatement.getTableId());
         Object fieldValue = ReflectUtil.getFieldValue(entity, mappedStatement.getTableId());
-        Put put = new Put(HbaseUtils.toBytes(currentKeyClass(), fieldValue));
+        Put put = new Put(HbaseUtils.toBytes(fieldValue));
         mappedStatement.getColumns()
                 .forEach((key, value) ->
                         put.addColumn(mappedStatement.getColumnFamilyBytes(),
                                 value.getColumnBytes(),
-                                HbaseUtils.toBytes(value.getType(), ReflectUtil.getFieldValue(entity, value.getField()))));
+                                HbaseUtils.toBytes(ReflectUtil.getFieldValue(entity, value.getField()))));
         mutations.add(put);
         hbaseTemplate.saveOrUpdate(mappedStatement.getTableName(), mutations);
         return entity;
