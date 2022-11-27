@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 public class StudentServiceTest extends TestInit {
 
@@ -62,8 +61,8 @@ public class StudentServiceTest extends TestInit {
     @Test
     void findById() {
 
-        Optional<Student> optional = studentService.findById(1596717171369631744L);
-        System.out.println(optional.get());
+        Student student = studentService.findById(1596717171369631744L);
+        System.out.println(student);
 
     }
 

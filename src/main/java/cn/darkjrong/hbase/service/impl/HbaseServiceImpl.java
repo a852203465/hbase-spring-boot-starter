@@ -7,7 +7,6 @@ import cn.darkjrong.hbase.domain.ObjectMappedStatement;
 import cn.darkjrong.hbase.factory.ObjectMappedFactory;
 import cn.darkjrong.hbase.factory.RowKeyGeneratorFactory;
 import cn.darkjrong.hbase.service.HbaseService;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
 import org.apache.hadoop.hbase.client.Mutation;
@@ -17,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * hbase 公共Service实现类
@@ -55,7 +52,7 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
     }
 
     @Override
-    public <S extends T> S save(S entity) {
+    public Boolean save(T entity) {
         ObjectMappedStatement mappedStatement = currentStatement();
         List<Mutation> mutations = new ArrayList<>();
         rowKeyGeneratorFactory.doHandler(mappedStatement.getIdType(), entity, mappedStatement.getTableId());
@@ -67,8 +64,7 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
                                 value.getColumnBytes(),
                                 HbaseUtils.toBytes(ReflectUtil.getFieldValue(entity, value.getField()))));
         mutations.add(put);
-        hbaseTemplate.saveOrUpdate(mappedStatement.getTableName(), mutations);
-        return entity;
+        return hbaseTemplate.saveOrUpdate(mappedStatement.getTableName(), mutations);
     }
 
     @Override
@@ -82,24 +78,14 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
     }
 
     @Override
-    public <S extends T> Iterable<S> saveAll(Iterable<S> entities) {
-        if (CollectionUtil.isNotEmpty(entities)) {
-            List<S> collections = new ArrayList<>();
-            entities.forEach(a-> collections.add(this.save(a)));
-           return collections;
-        }
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Optional<T> findById(ID id) {
+    public T findById(ID id) {
         ObjectMappedStatement statement = currentStatement();
-        return Optional.of(hbaseTemplate.get(statement.getTableName(), id, statement.getColumnFamily(), new RowMapper<T>() {
+        return hbaseTemplate.get(statement.getTableName(), id, statement.getColumnFamily(), new RowMapper<T>() {
             @Override
             public T mapRow(Result result, int rowNum) {
                 return HbaseUtils.objectParse(targetClass, result, currentStatement());
             }
-        }));
+        });
     }
 
     @Override

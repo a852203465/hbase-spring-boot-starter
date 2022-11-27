@@ -1626,11 +1626,12 @@ public class HbaseTemplate implements HbaseOperations {
             mutator = this.getConnection().getBufferedMutator(mutatorParams.writeBufferSize(3 * 1024 * 1024));
             return action.doInMutator(mutator);
         } catch (Throwable throwable) {
-            sw.stop();
-            throw new HbaseException(throwable);
+            log.error("executeMutatorCallback", throwable);
         } finally {
+            sw.stop();
             HbaseUtils.close(mutator);
         }
+        return null;
     }
 
     @Override
@@ -1645,13 +1646,12 @@ public class HbaseTemplate implements HbaseOperations {
         try {
             return action.doInTable(table);
         } catch (Throwable throwable) {
-            if (throwable instanceof Error) {
-                throw (Error) throwable;
-            }
-            throw new HbaseException(throwable);
+            log.error("executeTableCallback", throwable);
         } finally {
+            sw.stop();
             HbaseUtils.close(table);
         }
+        return null;
     }
 
     @Override
@@ -1683,11 +1683,11 @@ public class HbaseTemplate implements HbaseOperations {
                     scanner = table.getScanner(scan);
                     return action.extractData(scanner);
                 } catch (Exception e) {
-                    log.error("find", e);
-                    throw new HbaseException(e);
+                    log.error("The 【{}】 table fails to query data, 【{}】", tableName, e);
                 }finally {
                     HbaseUtils.close(scanner);
                 }
+                return null;
             }
         });
     }
@@ -1745,9 +1745,9 @@ public class HbaseTemplate implements HbaseOperations {
                     Result result = table.get(get);
                     return rowMapper.mapRow(result, 0);
                 } catch (IOException e) {
-                    log.error("get", e);
-                    throw new HbaseException(e);
+                    log.error("The 【{}】 table queries the exception according to 【{}】, 【{}】", tableName, rowKey, e);
                 }
+                return null;
             }
         });
     }
@@ -1775,50 +1775,51 @@ public class HbaseTemplate implements HbaseOperations {
                     Result result = table.get(get);
                     return rowMapper.mapRow(result, 0);
                 } catch (IOException e) {
-                    log.error("get", e);
-                    throw new HbaseException(e);
+                    log.error("The 【{}】 table queries the 【{}】 field according to 【{}】, 【{}】", tableName, qualifier, rowKey, e);
                 }
+                return null;
             }
         });
     }
 
     @Override
-    public void put(String tableName, String rowKey, String familyName, String qualifier, byte[] data) {
+    public Boolean put(String tableName, String rowKey, String familyName, String qualifier, byte[] data) {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         Assert.notBlank(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
         Assert.notBlank(familyName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "familyName"));
         Assert.notBlank(qualifier, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "qualifier"));
         Assert.isTrue(ArrayUtil.isNotEmpty(data), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "data"));
 
-        this.execute(tableName, new TableCallback<Void>() {
+        return this.execute(tableName, new TableCallback<Boolean>() {
             @Override
-            public Void doInTable(Table table) {
+            public Boolean doInTable(Table table) {
                 Put put = new Put(HbaseUtils.toBytes(rowKey)).addColumn(HbaseUtils.toBytes(familyName), HbaseUtils.toBytes(qualifier), data);
                 try {
                     table.put(put);
-                    return null;
+                    return Boolean.TRUE;
                 } catch (IOException e) {
                     log.error("put", e);
-                    throw new HbaseException(e);
+                    log.error("【{}】 field data in row 【{}】 of table 【{}】 was updated abnormally, 【{}】", qualifier, rowKey, tableName, e);
                 }
+                return Boolean.FALSE;
             }
         });
     }
 
     @Override
-    public void delete(String tableName, String rowKey, String columnFamily) {
-        this.delete(tableName, rowKey, columnFamily, null);
+    public Boolean delete(String tableName, String rowKey, String columnFamily) {
+        return this.delete(tableName, rowKey, columnFamily, null);
     }
 
     @Override
-    public void delete(String tableName, String rowKey, String columnFamily, String qualifier) {
+    public Boolean delete(String tableName, String rowKey, String columnFamily, String qualifier) {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         Assert.notBlank(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
         Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
 
-        execute(tableName, new TableCallback<Void>() {
+        return execute(tableName, new TableCallback<Boolean>() {
             @Override
-            public Void doInTable(Table table) {
+            public Boolean doInTable(Table table) {
                 Delete delete = new Delete(HbaseUtils.toBytes(rowKey));
                 byte[] family = HbaseUtils.toBytes(columnFamily);
                 if (StrUtil.isNotBlank(qualifier)) {
@@ -1828,33 +1829,33 @@ public class HbaseTemplate implements HbaseOperations {
                 }
                 try {
                     table.delete(delete);
-                    return null;
+                    return Boolean.TRUE;
                 } catch (IOException e) {
                     log.error("delete", e);
-                    throw new HbaseException(e);
+                    log.error("【{}】 field data of row 【{}】 in table 【{}】 is abnormal, 【{}】", qualifier, rowKey, tableName, e);
                 }
+                return Boolean.FALSE;
             }
         });
     }
 
     @Override
-    public void saveOrUpdate(String tableName, final Mutation mutation) {
-        this.execute(tableName, new MutatorCallback<Void>() {
-            @Override
-            public Void doInMutator(BufferedMutator mutator) throws Throwable {
-                mutator.mutate(mutation);
-                return null;
-            }
-        });
+    public Boolean saveOrUpdate(String tableName, final Mutation mutation) {
+        return saveOrUpdate(tableName, CollectionUtil.newArrayList(mutation));
     }
 
     @Override
-    public void saveOrUpdate(String tableName, final List<Mutation> mutations) {
-        this.execute(tableName, new MutatorCallback<Void>() {
+    public Boolean saveOrUpdate(String tableName, final List<Mutation> mutations) {
+        return this.execute(tableName, new MutatorCallback<Boolean>() {
             @Override
-            public Void doInMutator(BufferedMutator mutator) throws Throwable {
-                mutator.mutate(mutations);
-                return null;
+            public Boolean doInMutator(BufferedMutator mutator) {
+                try {
+                    mutator.mutate(mutations);
+                    return Boolean.TRUE;
+                } catch (IOException e) {
+                    log.error("【{}】Save or update exceptions, 【{}】",tableName, e);
+                }
+                return Boolean.FALSE;
             }
         });
     }

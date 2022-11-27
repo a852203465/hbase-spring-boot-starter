@@ -186,47 +186,52 @@ public interface HbaseOperations {
      * 插入单个数据
      *
      * @param tableName    表名
-     * @param rowKey      行Key
+     * @param rowKey       行Key
      * @param qualifier    字段名
      * @param data         数据
      * @param columnFamily 列族
+     * @return {@link Boolean}
      */
-    void put(String tableName, String rowKey, String columnFamily, String qualifier, byte[] data);
+    Boolean put(String tableName, String rowKey, String columnFamily, String qualifier, byte[] data);
 
     /**
      * 删除
      *
      * @param tableName    表名
-     * @param rowKey      行Key
+     * @param rowKey       行Key
      * @param columnFamily 列族
+     * @return {@link Boolean}
      */
-    void delete(String tableName, final String rowKey, final String columnFamily);
+    Boolean delete(String tableName, final String rowKey, final String columnFamily);
 
     /**
      * 删除
      *
      * @param tableName    表名
-     * @param rowKey      行Key
+     * @param rowKey       行Key
      * @param columnFamily 列族
      * @param qualifier    字段名
+     * @return {@link Boolean}
      */
-    void delete(String tableName, final String rowKey, final String columnFamily, final String qualifier);
+    Boolean delete(String tableName, final String rowKey, final String columnFamily, final String qualifier);
 
     /**
      * 保存或更新
      *
      * @param tableName 表名
      * @param mutation  操作数据
+     * @return {@link Boolean}
      */
-    void saveOrUpdate(String tableName, Mutation mutation);
+    Boolean saveOrUpdate(String tableName, Mutation mutation);
 
     /**
      * 保存或更新
      *
      * @param tableName 表名
      * @param mutations 操作数据
+     * @return {@link Boolean}
      */
-    void saveOrUpdate(String tableName, List<Mutation> mutations);
+    Boolean saveOrUpdate(String tableName, List<Mutation> mutations);
 
 
 
