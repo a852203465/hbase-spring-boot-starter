@@ -2,6 +2,7 @@ package cn.darkjrong.hbase.service;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 /**
  * hbase 公共Service
@@ -42,8 +43,14 @@ public interface HbaseService<T, ID extends Serializable> {
      */
     Boolean existsById(ID id);
 
-//    Iterable<T> findAllById(Iterable<ID> ids);
-//
+    /**
+     * 根据ID查询所有
+     *
+     * @param ids id
+     * @return {@link List}<{@link T}>
+     */
+    List<T> findAllById(Set<ID> ids);
+
 //    long count();
 //
 //    void deleteById(ID id);

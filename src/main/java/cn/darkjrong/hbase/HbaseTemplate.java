@@ -1656,11 +1656,13 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public <T> T find(String tableName, ResultsExtractor<T> extractor) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return find(tableName, new Scan(), extractor);
     }
 
     @Override
     public <T> T find(String tableName, String columnFamily, ResultsExtractor<T> extractor) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         Scan scan = new Scan();
         scan.addFamily(HbaseUtils.toBytes(columnFamily));
         return find(tableName, scan, extractor);
@@ -1668,6 +1670,7 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public <T> T find(String tableName, String columnFamily, String qualifier, ResultsExtractor<T> extractor) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         Scan scan = new Scan();
         scan.addColumn(HbaseUtils.toBytes(columnFamily), HbaseUtils.toBytes(qualifier));
         return find(tableName, scan, extractor);
@@ -1675,6 +1678,7 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public <T> T find(String tableName, Scan scan, ResultsExtractor<T> action) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return execute(tableName, new TableCallback<T>() {
             @Override
             public T doInTable(Table table) {
@@ -1694,11 +1698,13 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public <T> List<T> find(String tableName, RowMapper<T> rowMapper) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return find(tableName, new Scan(), rowMapper);
     }
 
     @Override
     public <T> List<T> find(String tableName, String columnFamily, RowMapper<T> action) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         Scan scan = new Scan();
         scan.addFamily(HbaseUtils.toBytes(columnFamily));
         return find(tableName, scan, action);
@@ -1706,6 +1712,7 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public <T> List<T> find(String tableName, String columnFamily, String qualifier, RowMapper<T> action) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         Scan scan = new Scan();
         scan.addColumn(HbaseUtils.toBytes(columnFamily), HbaseUtils.toBytes(qualifier));
         return find(tableName, scan, action);
@@ -1713,26 +1720,31 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public <T> List<T> find(String tableName, Scan scan, RowMapper<T> action) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return find(tableName, scan, new RowMapperResultsExtractor<>(action));
     }
 
     @Override
     public <T> T get(String tableName, String rowKey, RowMapper<T> action) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return get(tableName, rowKey, null, null, action);
     }
 
     @Override
     public <T, ID extends Serializable> T get(String tableName, ID rowKey, RowMapper<T> rowMapper) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return get(tableName, rowKey, null, rowMapper);
     }
 
     @Override
     public <T> T get(String tableName, String rowKey, String columnFamily, RowMapper<T> action) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return get(tableName, rowKey, columnFamily, null, action);
     }
 
     @Override
     public <T, ID extends Serializable> T get(String tableName, ID rowKey, String columnFamily, RowMapper<T> rowMapper) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return execute(tableName, new TableCallback<T>() {
             @Override
             public T doInTable(Table table) {
@@ -1754,11 +1766,13 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public <T> T get(String tableName, String rowKey, String columnFamily, String qualifier, RowMapper<T> action) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return get(tableName, (Serializable) rowKey, columnFamily, qualifier, action);
     }
 
     @Override
     public <T, ID extends Serializable> T get(String tableName, ID rowKey, String columnFamily, String qualifier, RowMapper<T> rowMapper) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return execute(tableName, new TableCallback<T>() {
             @Override
             public T doInTable(Table table) {
@@ -1808,6 +1822,7 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public Boolean delete(String tableName, String rowKey, String columnFamily) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return this.delete(tableName, rowKey, columnFamily, null);
     }
 
@@ -1840,11 +1855,13 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public Boolean saveOrUpdate(String tableName, final Mutation mutation) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return saveOrUpdate(tableName, CollectionUtil.newArrayList(mutation));
     }
 
     @Override
     public Boolean saveOrUpdate(String tableName, final List<Mutation> mutations) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return this.execute(tableName, new MutatorCallback<Boolean>() {
             @Override
             public Boolean doInMutator(BufferedMutator mutator) {
@@ -1878,13 +1895,53 @@ public class HbaseTemplate implements HbaseOperations {
         });
     }
 
+    @Override
+    public <T, ID extends Serializable> List<T> get(String tableName, Set<ID> rowKey, RowMapper<T> rowMapper) {
+        return this.get(tableName, rowKey, null, rowMapper);
+    }
+
+    @Override
+    public <T, ID extends Serializable> List<T> get(String tableName, Set<ID> rowKey, String columnFamily, RowMapper<T> rowMapper) {
+        return this.get(tableName, rowKey, columnFamily, null, rowMapper);
+    }
+
+    @Override
+    public <T, ID extends Serializable> List<T> get(String tableName, Set<ID> rowKey, String columnFamily, String qualifier, RowMapper<T> rowMapper) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notEmpty(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
+        return this.execute(tableName, new TableCallback<List<T>>() {
+            @Override
+            public List<T> doInTable(Table table) {
+                List<Get> gets = rowKey.stream().map(a -> {
+                    Get get = new Get(HbaseUtils.toBytes(a));
+                    if (StrUtil.isNotBlank(columnFamily)) {
+                        byte[] family = HbaseUtils.toBytes(columnFamily);
+                        if (StrUtil.isNotBlank(qualifier)) {
+                            get.addColumn(family, HbaseUtils.toBytes(qualifier));
+                        } else {
+                            get.addFamily(family);
+                        }
+                    }
+                    return get;
+                }).collect(Collectors.toList());
+
+                try {
+                    return rowMapper.mapRow(table.get(gets));
+                } catch (IOException e) {
+                    log.error("The 【{}】 table queries the 【{}】 field according to 【{}】, 【{}】", tableName, qualifier, rowKey, e);
+                }
+                return Collections.emptyList();
+            }
+        });
+    }
+
     /**
      * 表信息
      *
      * @param tableNames 表名
      * @return {@link List}<{@link TableInfo}>
      */
-    public static List<TableInfo> tableInfos(List<TableName> tableNames) {
+    private static List<TableInfo> tableInfos(List<TableName> tableNames) {
         if (CollectionUtil.isEmpty(tableNames)) {
             return Collections.emptyList();
         }
@@ -1901,7 +1958,7 @@ public class HbaseTemplate implements HbaseOperations {
      * @param tableName 表名
      * @return {@link TableInfo}
      */
-    public static TableInfo tableInfo(TableName tableName) {
+    private static TableInfo tableInfo(TableName tableName) {
         if (ObjectUtil.isEmpty(tableName)) {
             return null;
         }

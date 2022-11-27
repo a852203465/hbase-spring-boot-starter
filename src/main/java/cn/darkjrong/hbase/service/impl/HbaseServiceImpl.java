@@ -1,5 +1,6 @@
 package cn.darkjrong.hbase.service.impl;
 
+import cn.darkjrong.hbase.HbaseException;
 import cn.darkjrong.hbase.HbaseTemplate;
 import cn.darkjrong.hbase.HbaseUtils;
 import cn.darkjrong.hbase.callback.RowMapper;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * hbase 公共Service实现类
@@ -95,5 +97,17 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
         Assert.notNull(id, HbaseExceptionEnum.ID_IS_REQUIRED.getValue());
         ObjectMappedStatement statement = currentStatement();
         return hbaseTemplate.exists(statement.getTableName(), id);
+    }
+
+    @Override
+    public List<T> findAllById(Set<ID> ids) {
+        Assert.notEmpty(ids, HbaseExceptionEnum.ID_IS_REQUIRED.getValue());
+        ObjectMappedStatement statement = currentStatement();
+        return hbaseTemplate.get(statement.getTableName(), ids, statement.getColumnFamily(), new RowMapper<T>() {
+            @Override
+            public T mapRow(Result result, int rowNum) throws HbaseException {
+                return HbaseUtils.objectParse(targetClass, result, currentStatement());
+            }
+        });
     }
 }

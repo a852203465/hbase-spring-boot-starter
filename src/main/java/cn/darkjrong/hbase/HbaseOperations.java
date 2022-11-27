@@ -1,14 +1,15 @@
 package cn.darkjrong.hbase;
 
 import cn.darkjrong.hbase.callback.MutatorCallback;
-import cn.darkjrong.hbase.callback.TableCallback;
 import cn.darkjrong.hbase.callback.ResultsExtractor;
 import cn.darkjrong.hbase.callback.RowMapper;
+import cn.darkjrong.hbase.callback.TableCallback;
 import org.apache.hadoop.hbase.client.Mutation;
 import org.apache.hadoop.hbase.client.Scan;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 /**
  * hbase操作类
@@ -242,9 +243,38 @@ public interface HbaseOperations {
      */
     <ID extends Serializable> Boolean exists(String tableName, ID rowKey);
 
+    /**
+     * 获取多行
+     *
+     * @param tableName 表名
+     * @param rowKey    行Key
+     * @param rowMapper 行映射器
+     * @return {@link List}<{@link T}>
+     */
+    <T, ID extends Serializable> List<T> get(String tableName, Set<ID> rowKey, RowMapper<T> rowMapper);
 
+    /**
+     * 获取行
+     *
+     * @param tableName    表名
+     * @param rowKey       行Key
+     * @param rowMapper    行映射器
+     * @param columnFamily 列族
+     * @return {@link List}<{@link T}>
+     */
+    <T, ID extends Serializable> List<T> get(String tableName, Set<ID> rowKey, String columnFamily, RowMapper<T> rowMapper);
 
-
+    /**
+     * 获取行
+     *
+     * @param tableName    表名
+     * @param rowKey       行Key
+     * @param rowMapper    行映射器
+     * @param columnFamily 列族
+     * @param qualifier    字段名
+     * @return {@link List}<{@link T}>
+     */
+    <T, ID extends Serializable> List<T> get(String tableName, Set<ID> rowKey, String columnFamily, String qualifier, RowMapper<T> rowMapper);
 
 
 
