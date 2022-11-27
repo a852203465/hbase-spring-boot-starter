@@ -1,4 +1,4 @@
-package cn.darkjrong.hbase.service.impl;
+package cn.darkjrong.hbase.repository.support;
 
 import cn.darkjrong.hbase.HbaseException;
 import cn.darkjrong.hbase.HbaseTemplate;
@@ -8,7 +8,7 @@ import cn.darkjrong.hbase.domain.ObjectMappedStatement;
 import cn.darkjrong.hbase.enums.HbaseExceptionEnum;
 import cn.darkjrong.hbase.factory.ObjectMappedFactory;
 import cn.darkjrong.hbase.factory.RowKeyGeneratorFactory;
-import cn.darkjrong.hbase.service.HbaseService;
+import cn.darkjrong.hbase.repository.HbaseRepository;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
@@ -23,12 +23,15 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * hbase 公共Service实现类
+ * hbase 持久层简单实现
  *
+ * @param <T> 实体类泛型
+ * @param <ID> 主键类型泛型
  * @author Rong.Jia
- * @date 2022/11/20
+ * @date 2022/11/27
  */
-public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseService<T, ID> {
+//@Repository
+public class SimpleHbaseRepository<T, ID extends Serializable> implements HbaseRepository<T, ID> {
 
     protected Class<T> targetClass = this.currentTargetClass();
     protected Class<ID> keyClass = this.currentKeyClass();
@@ -117,10 +120,11 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
         return hbaseTemplate.delete(statement.getTableName(), id, statement.getColumnFamily());
     }
 
-    @Override
-    public Boolean deleteAllById(Set<ID> ids) {
-        Assert.notEmpty(ids, HbaseExceptionEnum.ID_IS_REQUIRED.getValue());
-        ObjectMappedStatement statement = currentStatement();
-        return hbaseTemplate.delete(statement.getTableName(), ids, statement.getColumnFamily());
-    }
+
+
+
+
+
+
+
 }

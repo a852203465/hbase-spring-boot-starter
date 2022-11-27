@@ -221,6 +221,16 @@ public interface HbaseOperations {
      * @param tableName    表名
      * @param rowKey       行Key
      * @param columnFamily 列族
+     * @return {@link Boolean}
+     */
+    <ID extends Serializable> Boolean delete(String tableName, final Set<ID> rowKey, final String columnFamily);
+
+    /**
+     * 删除
+     *
+     * @param tableName    表名
+     * @param rowKey       行Key
+     * @param columnFamily 列族
      * @param qualifier    字段名
      * @return {@link Boolean}
      */
@@ -236,6 +246,17 @@ public interface HbaseOperations {
      * @return {@link Boolean}
      */
     <ID extends Serializable> Boolean delete(String tableName, final ID rowKey, final String columnFamily, final String qualifier);
+
+    /**
+     * 删除
+     *
+     * @param tableName    表名
+     * @param rowKey       行Key
+     * @param columnFamily 列族
+     * @param qualifier    字段名
+     * @return {@link Boolean}
+     */
+    <ID extends Serializable> Boolean delete(String tableName, final Set<ID> rowKey, final String columnFamily, final String qualifier);
 
     /**
      * 保存或更新

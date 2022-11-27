@@ -1831,28 +1831,41 @@ public class HbaseTemplate implements HbaseOperations {
     }
 
     @Override
+    public <ID extends Serializable> Boolean delete(String tableName, Set<ID> rowKey, String columnFamily) {
+        return this.delete(tableName, rowKey, columnFamily, null);
+    }
+
+    @Override
     public Boolean delete(String tableName, String rowKey, String columnFamily, String qualifier) {
         return this.delete(tableName, (Serializable) rowKey, columnFamily, qualifier);
     }
 
     @Override
     public <ID extends Serializable> Boolean delete(String tableName, ID rowKey, String columnFamily, String qualifier) {
+        return this.delete(tableName, Collections.singleton(rowKey), columnFamily, qualifier);
+    }
+
+    @Override
+    public <ID extends Serializable> Boolean delete(String tableName, Set<ID> rowKey, String columnFamily, String qualifier) {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notNull(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
+        Assert.notEmpty(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
         Assert.notNull(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
 
         return this.execute(tableName, new TableCallback<Boolean>() {
             @Override
             public Boolean doInTable(Table table) {
-                Delete delete = new Delete(HbaseUtils.toBytes(rowKey));
-                byte[] family = HbaseUtils.toBytes(columnFamily);
-                if (StrUtil.isNotBlank(qualifier)) {
-                    delete.addColumn(family, HbaseUtils.toBytes(qualifier));
-                } else {
-                    delete.addFamily(family);
-                }
+                List<Delete> deletes = rowKey.stream().map(a -> {
+                    Delete delete = new Delete(HbaseUtils.toBytes(a));
+                    byte[] family = HbaseUtils.toBytes(columnFamily);
+                    if (StrUtil.isNotBlank(qualifier)) {
+                        delete.addColumn(family, HbaseUtils.toBytes(qualifier));
+                    } else {
+                        delete.addFamily(family);
+                    }
+                    return delete;
+                }).collect(Collectors.toList());
                 try {
-                    table.delete(delete);
+                    table.delete(deletes);
                     return Boolean.TRUE;
                 } catch (IOException e) {
                     log.error("【{}】 field data of row 【{}】 in table 【{}】 is abnormal, 【{}】", qualifier, rowKey, tableName, e);

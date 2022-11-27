@@ -1,16 +1,18 @@
-package cn.darkjrong.hbase.service;
+package cn.darkjrong.hbase.repository;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
 /**
- * hbase 公共Service
+ * hbase 持久层
  *
+ * @param <T> 实体类泛型
+ * @param <ID> 主键类型泛型
  * @author Rong.Jia
- * @date 2022/11/20
+ * @date 2022/11/27
  */
-public interface HbaseService<T, ID extends Serializable> {
+public interface HbaseRepository<T, ID extends Serializable> {
 
     /**
      * 添加
@@ -54,22 +56,10 @@ public interface HbaseService<T, ID extends Serializable> {
     /**
      * 根据ID删除
      *
-     * @param id 主键
+     * @param id id
      * @return {@link Boolean}
      */
     Boolean deleteById(ID id);
-
-    /**
-     * 根据ID集合删除
-     *
-     * @param ids 主键
-     * @return {@link Boolean}
-     */
-    Boolean deleteAllById(Set<ID> ids);
-//
-//    void deleteAll(Iterable<? extends T> entities);
-//
-//    void deleteAll();
 
 
 
