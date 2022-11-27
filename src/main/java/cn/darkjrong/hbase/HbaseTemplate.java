@@ -1817,7 +1817,7 @@ public class HbaseTemplate implements HbaseOperations {
         Assert.notBlank(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
         Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
 
-        return execute(tableName, new TableCallback<Boolean>() {
+        return this.execute(tableName, new TableCallback<Boolean>() {
             @Override
             public Boolean doInTable(Table table) {
                 Delete delete = new Delete(HbaseUtils.toBytes(rowKey));
@@ -1831,7 +1831,6 @@ public class HbaseTemplate implements HbaseOperations {
                     table.delete(delete);
                     return Boolean.TRUE;
                 } catch (IOException e) {
-                    log.error("delete", e);
                     log.error("【{}】 field data of row 【{}】 in table 【{}】 is abnormal, 【{}】", qualifier, rowKey, tableName, e);
                 }
                 return Boolean.FALSE;
@@ -1854,6 +1853,25 @@ public class HbaseTemplate implements HbaseOperations {
                     return Boolean.TRUE;
                 } catch (IOException e) {
                     log.error("【{}】Save or update exceptions, 【{}】",tableName, e);
+                }
+                return Boolean.FALSE;
+            }
+        });
+    }
+
+    @Override
+    public <ID extends Serializable> Boolean exists(String tableName, ID rowKey) {
+        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
+        Assert.notNull(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
+        return this.execute(tableName, new TableCallback<Boolean>() {
+            @Override
+            public Boolean doInTable(Table table) {
+                Get get = new Get(HbaseUtils.toBytes(rowKey));
+                get.setCheckExistenceOnly(Boolean.TRUE);
+                try {
+                    return table.get(get).getExists();
+                } catch (IOException e) {
+                    log.error("Verify abnormal data on 【{}】 line of 【{}】 table, 【{}】", rowKey, tableName, e);
                 }
                 return Boolean.FALSE;
             }

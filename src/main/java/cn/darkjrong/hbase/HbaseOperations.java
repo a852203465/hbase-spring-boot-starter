@@ -233,6 +233,17 @@ public interface HbaseOperations {
      */
     Boolean saveOrUpdate(String tableName, List<Mutation> mutations);
 
+    /**
+     * 存在
+     *
+     * @param tableName 表名
+     * @param rowKey    行键
+     * @return {@link Boolean}
+     */
+    <ID extends Serializable> Boolean exists(String tableName, ID rowKey);
+
+
+
 
 
 

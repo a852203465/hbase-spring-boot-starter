@@ -4,9 +4,11 @@ import cn.darkjrong.hbase.HbaseTemplate;
 import cn.darkjrong.hbase.HbaseUtils;
 import cn.darkjrong.hbase.callback.RowMapper;
 import cn.darkjrong.hbase.domain.ObjectMappedStatement;
+import cn.darkjrong.hbase.enums.HbaseExceptionEnum;
 import cn.darkjrong.hbase.factory.ObjectMappedFactory;
 import cn.darkjrong.hbase.factory.RowKeyGeneratorFactory;
 import cn.darkjrong.hbase.service.HbaseService;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.TypeUtil;
 import org.apache.hadoop.hbase.client.Mutation;
@@ -89,7 +91,9 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
     }
 
     @Override
-    public boolean existsById(ID id) {
-        return false;
+    public Boolean existsById(ID id) {
+        Assert.notNull(id, HbaseExceptionEnum.ID_IS_REQUIRED.getValue());
+        ObjectMappedStatement statement = currentStatement();
+        return hbaseTemplate.exists(statement.getTableName(), id);
     }
 }

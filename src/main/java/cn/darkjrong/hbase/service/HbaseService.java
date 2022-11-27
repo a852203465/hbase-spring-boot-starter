@@ -34,9 +34,13 @@ public interface HbaseService<T, ID extends Serializable> {
      */
     T findById(ID id);
 
-    boolean existsById(ID id);
-
-
+    /**
+     * 根据ID判断是否存在数据
+     *
+     * @param id 主键
+     * @return {@link Boolean}
+     */
+    Boolean existsById(ID id);
 
 //    Iterable<T> findAllById(Iterable<ID> ids);
 //
