@@ -1,18 +1,13 @@
 package cn.darkjrong.hbase;
 
-import cn.darkjrong.hbase.callback.RowMapper;
 import cn.darkjrong.hbase.domain.ServerInfo;
 import cn.darkjrong.hbase.domain.TableInfo;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseFactoryBean;
 import cn.darkjrong.spring.boot.autoconfigure.HbaseProperties;
-import cn.hutool.core.util.ReflectUtil;
-import com.alibaba.fastjson.JSON;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.NamespaceDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -360,28 +355,7 @@ public class HbaseTemplateTest {
         System.out.println(hbaseTemplate.getClusterId());
     }
 
-    @Test
-    void findList() {
 
-        String tableName = "stu";
-
-        List<Student> students = hbaseTemplate.find(tableName, new RowMapper<Student>() {
-            @Override
-            public Student mapRow(Result result, int rowNum) throws HbaseException {
-                Student student = new Student();
-                for(Cell cell : result.rawCells()) {
-                    String qualifier = Bytes.toString(cell.getQualifierArray(),cell.getQualifierOffset(),cell.getQualifierLength());
-                    Object value = HbaseUtils.getValue(ReflectUtil.getField(Student.class, qualifier).getType(), cell.getValueArray(), cell.getValueOffset(), cell.getValueLength());
-                    ReflectUtil.setFieldValue(student, qualifier, value);
-                }
-                return student;
-            }
-        });
-
-        System.out.println(JSON.toJSONString(students));
-
-
-    }
 
 
 

@@ -1,6 +1,5 @@
 package cn.darkjrong.spring.boot.autoconfigure;
 
-import cn.darkjrong.hbase.enums.IdType;
 import lombok.Data;
 import org.apache.hadoop.hbase.HConstants;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -36,10 +35,6 @@ public class HbaseProperties {
      */
     private boolean tableSanityChecks = Boolean.TRUE;
 
-    /**
-     * ID类型
-     */
-    private IdType idType = IdType.ASSIGN_ID;
 
 
 
