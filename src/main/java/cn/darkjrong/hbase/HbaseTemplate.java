@@ -1627,11 +1627,11 @@ public class HbaseTemplate implements HbaseOperations {
             return action.doInMutator(mutator);
         } catch (Throwable throwable) {
             log.error("executeMutatorCallback", throwable);
+            throw new HbaseException(throwable);
         } finally {
             sw.stop();
             HbaseUtils.close(mutator);
         }
-        return null;
     }
 
     @Override
@@ -1647,11 +1647,11 @@ public class HbaseTemplate implements HbaseOperations {
             return action.doInTable(table);
         } catch (Throwable throwable) {
             log.error("executeTableCallback", throwable);
+            throw new HbaseException(throwable);
         } finally {
             sw.stop();
             HbaseUtils.close(table);
         }
-        return null;
     }
 
     @Override
@@ -1797,25 +1797,24 @@ public class HbaseTemplate implements HbaseOperations {
     }
 
     @Override
-    public Boolean put(String tableName, String rowKey, String familyName, String qualifier, byte[] data) {
+    public void put(String tableName, String rowKey, String familyName, String qualifier, byte[] data) throws HbaseException {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         Assert.notBlank(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
         Assert.notBlank(familyName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "familyName"));
         Assert.notBlank(qualifier, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "qualifier"));
         Assert.isTrue(ArrayUtil.isNotEmpty(data), HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "data"));
 
-        return this.execute(tableName, new TableCallback<Boolean>() {
+        this.execute(tableName, new TableCallback<Void>() {
             @Override
-            public Boolean doInTable(Table table) {
+            public Void doInTable(Table table) {
                 Put put = new Put(HbaseUtils.toBytes(rowKey)).addColumn(HbaseUtils.toBytes(familyName), HbaseUtils.toBytes(qualifier), data);
                 try {
                     table.put(put);
-                    return Boolean.TRUE;
                 } catch (IOException e) {
-                    log.error("put", e);
                     log.error("【{}】 field data in row 【{}】 of table 【{}】 was updated abnormally, 【{}】", qualifier, rowKey, tableName, e);
+                    throw new HbaseException(e);
                 }
-                return Boolean.FALSE;
+                return null;
             }
         });
     }
@@ -1876,24 +1875,24 @@ public class HbaseTemplate implements HbaseOperations {
     }
 
     @Override
-    public Boolean saveOrUpdate(String tableName, final Mutation mutation) {
+    public void saveOrUpdate(String tableName, final Mutation mutation) throws HbaseException {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
-        return saveOrUpdate(tableName, CollectionUtil.newArrayList(mutation));
+        saveOrUpdate(tableName, CollectionUtil.newArrayList(mutation));
     }
 
     @Override
-    public Boolean saveOrUpdate(String tableName, final List<Mutation> mutations) {
+    public void saveOrUpdate(String tableName, final List<Mutation> mutations) throws HbaseException {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
-        return this.execute(tableName, new MutatorCallback<Boolean>() {
+        this.execute(tableName, new MutatorCallback<Void>() {
             @Override
-            public Boolean doInMutator(BufferedMutator mutator) {
+            public Void doInMutator(BufferedMutator mutator) {
                 try {
                     mutator.mutate(mutations);
-                    return Boolean.TRUE;
                 } catch (IOException e) {
                     log.error("【{}】Save or update exceptions, 【{}】",tableName, e);
+                    throw new HbaseException(e);
                 }
-                return Boolean.FALSE;
+                return null;
             }
         });
     }

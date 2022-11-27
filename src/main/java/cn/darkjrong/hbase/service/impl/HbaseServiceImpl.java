@@ -55,7 +55,7 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
     }
 
     @Override
-    public Boolean save(T entity) {
+    public void save(T entity) {
         ObjectMappedStatement mappedStatement = currentStatement();
         List<Mutation> mutations = new ArrayList<>();
         rowKeyGeneratorFactory.doHandler(mappedStatement.getIdType(), entity, mappedStatement.getTableId());
@@ -67,7 +67,7 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
                                 value.getColumnBytes(),
                                 HbaseUtils.toBytes(ReflectUtil.getFieldValue(entity, value.getField()))));
         mutations.add(put);
-        return hbaseTemplate.saveOrUpdate(mappedStatement.getTableName(), mutations);
+        hbaseTemplate.saveOrUpdate(mappedStatement.getTableName(), mutations);
     }
 
     @Override

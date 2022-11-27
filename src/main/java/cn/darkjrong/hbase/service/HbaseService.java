@@ -16,9 +16,8 @@ public interface HbaseService<T, ID extends Serializable> {
      * 添加
      *
      * @param entity 实体
-     * @return {@link Boolean}
      */
-    Boolean save(T entity);
+    void save(T entity);
 
     /**
      * 查询所有

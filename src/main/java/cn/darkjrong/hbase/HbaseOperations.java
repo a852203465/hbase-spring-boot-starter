@@ -25,8 +25,9 @@ public interface HbaseOperations {
      * @param tableName 表名
      * @param action    删除，修改回调
      * @return {@link T}
+     * @throws HbaseException hbase异常
      */
-    <T> T execute(String tableName, MutatorCallback<T> action);
+    <T> T execute(String tableName, MutatorCallback<T> action) throws HbaseException;
 
     /**
      * 执行
@@ -34,8 +35,9 @@ public interface HbaseOperations {
      * @param tableName 表名
      * @param callback  回调
      * @return {@link T}
+     * @throws HbaseException hbase异常
      */
-    <T> T execute(String tableName, TableCallback<T> callback);
+    <T> T execute(String tableName, TableCallback<T> callback) throws HbaseException;
 
     /**
      * 查询
@@ -191,9 +193,9 @@ public interface HbaseOperations {
      * @param qualifier    字段名
      * @param data         数据
      * @param columnFamily 列族
-     * @return {@link Boolean}
+     * @throws HbaseException hbase异常
      */
-    Boolean put(String tableName, String rowKey, String columnFamily, String qualifier, byte[] data);
+    void put(String tableName, String rowKey, String columnFamily, String qualifier, byte[] data) throws HbaseException;
 
     /**
      * 删除
@@ -263,18 +265,18 @@ public interface HbaseOperations {
      *
      * @param tableName 表名
      * @param mutation  操作数据
-     * @return {@link Boolean}
+     * @throws HbaseException hbase异常
      */
-    Boolean saveOrUpdate(String tableName, Mutation mutation);
+    void saveOrUpdate(String tableName, Mutation mutation) throws HbaseException;
 
     /**
      * 保存或更新
      *
      * @param tableName 表名
      * @param mutations 操作数据
-     * @return {@link Boolean}
+     * @throws HbaseException hbase异常
      */
-    Boolean saveOrUpdate(String tableName, List<Mutation> mutations);
+    void saveOrUpdate(String tableName, List<Mutation> mutations) throws HbaseException;
 
     /**
      * 存在
