@@ -1822,15 +1822,24 @@ public class HbaseTemplate implements HbaseOperations {
 
     @Override
     public Boolean delete(String tableName, String rowKey, String columnFamily) {
-        Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
         return this.delete(tableName, rowKey, columnFamily, null);
     }
 
     @Override
+    public <ID extends Serializable> Boolean delete(String tableName, ID rowKey, String columnFamily) {
+        return this.delete(tableName, (Serializable) rowKey, columnFamily, null);
+    }
+
+    @Override
     public Boolean delete(String tableName, String rowKey, String columnFamily, String qualifier) {
+        return this.delete(tableName, (Serializable) rowKey, columnFamily, qualifier);
+    }
+
+    @Override
+    public <ID extends Serializable> Boolean delete(String tableName, ID rowKey, String columnFamily, String qualifier) {
         Assert.notBlank(tableName, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "tableName"));
-        Assert.notBlank(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
-        Assert.notBlank(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
+        Assert.notNull(rowKey, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "rowKey"));
+        Assert.notNull(columnFamily, HbaseExceptionEnum.getException(HbaseExceptionEnum.GIVEN_VALUE, "columnFamily"));
 
         return this.execute(tableName, new TableCallback<Boolean>() {
             @Override

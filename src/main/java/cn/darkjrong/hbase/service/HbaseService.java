@@ -51,10 +51,14 @@ public interface HbaseService<T, ID extends Serializable> {
      */
     List<T> findAllById(Set<ID> ids);
 
-//    long count();
-//
-//    void deleteById(ID id);
-//
+    /**
+     * 根据ID删除
+     *
+     * @param id id
+     * @return {@link Boolean}
+     */
+    Boolean deleteById(ID id);
+
 //    void delete(T entity);
 //
 //    void deleteAllById(Iterable<? extends ID> ids);

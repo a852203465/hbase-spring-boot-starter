@@ -110,4 +110,11 @@ public class HbaseServiceImpl<T, ID extends Serializable> implements HbaseServic
             }
         });
     }
+
+    @Override
+    public Boolean deleteById(ID id) {
+        Assert.notNull(id, HbaseExceptionEnum.ID_IS_REQUIRED.getValue());
+        ObjectMappedStatement statement = currentStatement();
+        return hbaseTemplate.delete(statement.getTableName(), id, statement.getColumnFamily());
+    }
 }

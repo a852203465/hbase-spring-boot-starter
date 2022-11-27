@@ -85,7 +85,11 @@ public class StudentServiceTest extends TestInit {
 
         System.out.println(JSON.toJSONString(students));
 
+    }
 
+    @Test
+    void deleteById() {
+        System.out.println(studentService.deleteById(1596768913939542016L));
     }
 
 
